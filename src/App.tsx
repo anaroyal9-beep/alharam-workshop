@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WorkshopProvider } from "@/context/WorkshopContext";
 import Layout from "@/components/Layout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import NewMaintenance from "@/pages/NewMaintenance";
 import MaintenanceDetail from "@/pages/MaintenanceDetail";
@@ -24,14 +26,17 @@ const App = () => (
       <WorkshopProvider>
         <BrowserRouter>
           <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/maintenance/new" element={<NewMaintenance />} />
-              <Route path="/maintenance/:id" element={<MaintenanceDetail />} />
-              <Route path="/records" element={<Records />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/customers/:id" element={<CustomerDetail />} />
-              <Route path="/search" element={<SearchPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/maintenance/new" element={<NewMaintenance />} />
+                <Route path="/maintenance/:id" element={<MaintenanceDetail />} />
+                <Route path="/records" element={<Records />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/customers/:id" element={<CustomerDetail />} />
+                <Route path="/search" element={<SearchPage />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
