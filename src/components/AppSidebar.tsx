@@ -43,8 +43,8 @@ const AppSidebar = () => {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors",
                 isActive
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                  : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  ? "bg-sidebar-primary text-white shadow-md"
+                  : "text-white/80 hover:bg-sidebar-accent hover:text-white"
               )}
             >
               <link.icon className="w-5 h-5" />
