@@ -53,7 +53,7 @@ const AppSidebar = () => {
           );
         })}
       </nav>
-      <div className="p-4 border-t border-sidebar-border text-xs text-sidebar-foreground/40 text-center">
+      <div className="p-4 border-t border-sidebar-border text-xs text-white/40 text-center font-bold">
         © 2026 ورشة الهرم المثالي للآلات والمعدات
       </div>
     </aside>
