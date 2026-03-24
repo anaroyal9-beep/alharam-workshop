@@ -2,53 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 25% 10%;
+    --background: 210 15% 96%;
+    --foreground: 210 20% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 210 20% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 210 20% 12%;
 
-    --primary: 213 56% 33%;
+    --primary: 0 72% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 38 70% 50%;
+    --secondary: 210 14% 40%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 14% 92%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 210 12% 91%;
+    --muted-foreground: 210 10% 46%;
 
-    --accent: 170 45% 42%;
+    --accent: 210 18% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 87%;
-    --input: 220 13% 87%;
-    --ring: 213 56% 33%;
+    --border: 210 12% 86%;
+    --input: 210 12% 86%;
+    --ring: 0 72% 45%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
     --success: 152 56% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --sidebar-background: 213 56% 20%;
-    --sidebar-foreground: 213 20% 90%;
-    --sidebar-primary: 38 70% 50%;
+    --sidebar-background: 210 20% 14%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 0 72% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 50% 28%;
-    --sidebar-accent-foreground: 213 20% 90%;
-    --sidebar-border: 213 40% 30%;
-    --sidebar-ring: 38 70% 50%;
+    --sidebar-accent: 210 18% 22%;
+    --sidebar-accent-foreground: 210 15% 90%;
+    --sidebar-border: 210 15% 24%;
+    --sidebar-ring: 0 72% 50%;
   }
 }
 

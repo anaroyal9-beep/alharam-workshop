@@ -16,7 +16,7 @@ const variantStyles = {
 };
 
 const StatCard = ({ title, value, icon: Icon, variant = "primary" }: StatCardProps) => (
-  <div className="bg-card rounded-lg p-5 shadow-sm border border-border animate-fade-in">
+  <div className="bg-card rounded-xl p-5 shadow-md border border-border animate-fade-in">
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm text-muted-foreground">{title}</p>
