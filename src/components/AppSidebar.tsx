@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Wrench, Users, Search, Plus, ImageIcon } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Search, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.jpg";
 
 const links = [
   { to: "/", label: "لوحة التحكم", icon: LayoutDashboard },
@@ -14,18 +15,19 @@ const AppSidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-64 min-h-screen bg-sidebar flex flex-col shrink-0">
-      <div className="p-5 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          {/* Logo placeholder */}
-          <div className="w-11 h-11 rounded-lg bg-sidebar-accent flex items-center justify-center border border-sidebar-border shrink-0">
-            <ImageIcon className="w-5 h-5 text-sidebar-foreground/50" />
-          </div>
+    <aside className="w-72 min-h-screen bg-sidebar flex flex-col shrink-0">
+      <div className="p-6 border-b border-sidebar-border">
+        <div className="flex items-center gap-4">
+          <img
+            src={logo}
+            alt="شعار ورشة الهرم المثالي"
+            className="w-14 h-14 rounded-xl object-contain bg-white p-1 shrink-0"
+          />
           <div className="min-w-0">
-            <h1 className="text-sm font-extrabold text-sidebar-primary leading-tight">
+            <h1 className="text-base font-extrabold text-white leading-snug">
               ورشة الهرم المثالي
             </h1>
-            <p className="text-[11px] text-sidebar-foreground/60 mt-0.5 leading-tight">
+            <p className="text-xs font-bold text-white/70 mt-0.5 leading-tight">
               للآلات والمعدات
             </p>
           </div>
