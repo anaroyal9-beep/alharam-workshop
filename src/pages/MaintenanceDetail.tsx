@@ -163,17 +163,29 @@ const MaintenanceDetail = () => {
           {/* Maintenance Status */}
           <div className="bg-muted/40 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-foreground">الصيانة</span>
-              <Switch
+              <div className="flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-foreground" />
+                <span className="text-sm font-semibold text-foreground">الصيانة</span>
+              </div>
+              <button
                 className="print:hidden"
-                checked={record.isCompleted}
-                onCheckedChange={(v) =>
+                onClick={() =>
                   updateRecord(record.id, {
-                    isCompleted: v,
-                    deliveryDate: v ? new Date().toISOString().split("T")[0] : undefined,
+                    isCompleted: !record.isCompleted,
+                    deliveryDate: !record.isCompleted ? new Date().toISOString().split("T")[0] : undefined,
                   })
                 }
-              />
+              >
+                {record.isCompleted ? (
+                  <div className="w-7 h-7 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  </div>
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[hsl(var(--destructive))] flex items-center justify-center shadow-sm">
+                    <AlertCircle className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </button>
             </div>
             <StatusBadge
               active={record.isCompleted}
@@ -186,14 +198,25 @@ const MaintenanceDetail = () => {
 
           {/* Payment Status */}
           <div className="bg-muted/40 rounded-lg p-4 space-y-3">
-            <span className="text-sm font-semibold text-foreground block">الدفع</span>
-            <StatusBadge
-              active={record.isPaid}
-              activeIcon={CheckCircle2}
-              inactiveIcon={AlertCircle}
-              activeLabel="مدفوع"
-              inactiveLabel="غير مدفوع"
-            />
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground">الدفع</span>
+            </div>
+            {record.isPaid ? (
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[hsl(var(--success))] flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">$</span>
+                </div>
+                <span className="text-sm font-semibold text-[hsl(var(--success))]">مدفوع</span>
+              </div>
+            ) : (
+              <StatusBadge
+                active={false}
+                activeIcon={CheckCircle2}
+                inactiveIcon={AlertCircle}
+                activeLabel="مدفوع"
+                inactiveLabel="غير مدفوع"
+              />
+            )}
             <div className="print:hidden">
               {!record.isPaid ? (
                 <Button
