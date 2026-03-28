@@ -1,9 +1,9 @@
 import { useWorkshop } from "@/context/WorkshopContext";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, Clock, BanknoteIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ShieldCheck, ShieldX } from "lucide-react";
 
 const Records = () => {
   const { records, getCustomerById, searchRecords } = useWorkshop();
@@ -25,8 +25,9 @@ const Records = () => {
               <th className="text-right p-3">الجهاز</th>
               <th className="text-right p-3">العميل</th>
               <th className="text-right p-3">التاريخ</th>
-              <th className="text-right p-3">الحالة</th>
+              <th className="text-right p-3">الصيانة</th>
               <th className="text-right p-3">الدفع</th>
+              <th className="text-right p-3">الضمان</th>
             </tr>
           </thead>
           <tbody>
@@ -44,26 +45,34 @@ const Records = () => {
                   <td className="p-3">{customer?.name}</td>
                   <td className="p-3 text-sm text-muted-foreground">{r.receivedDate}</td>
                   <td className="p-3">
-                    <span className={cn("inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium",
-                      r.isCompleted ? "bg-success/15 text-success" : "bg-secondary/15 text-secondary"
-                    )}>
-                      {r.isCompleted ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                      {r.isCompleted ? "مكتملة" : "قيد الصيانة"}
-                    </span>
+                    <Badge className={r.isCompleted
+                      ? "bg-green-500/15 text-green-600 border-green-500/30"
+                      : "bg-red-500/15 text-red-600 border-red-500/30"
+                    }>
+                      {r.isCompleted ? "مكتملة" : "قيد الانتظار"}
+                    </Badge>
                   </td>
                   <td className="p-3">
-                    <span className={cn("inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium",
-                      r.isPaid ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
-                    )}>
-                      <BanknoteIcon className="w-3 h-3" />
-                      {r.isPaid ? "مدفوع" : `${total} ر.س`}
-                    </span>
+                    <Badge className={r.isPaid
+                      ? "bg-green-500/15 text-green-600 border-green-500/30"
+                      : "bg-red-500/15 text-red-600 border-red-500/30"
+                    }>
+                      {r.isPaid ? "مدفوع" : `غير مدفوع - ${total} ر.س`}
+                    </Badge>
+                  </td>
+                  <td className="p-3">
+                    <Badge className={r.isUnderWarranty
+                      ? "bg-green-500/15 text-green-600 border-green-500/30"
+                      : "bg-red-500/15 text-red-600 border-red-500/30"
+                    }>
+                      {r.isUnderWarranty ? <><ShieldCheck className="w-3 h-3 ml-1" /> نعم</> : <><ShieldX className="w-3 h-3 ml-1" /> لا</>}
+                    </Badge>
                   </td>
                 </tr>
               );
             })}
             {displayed.length === 0 && (
-              <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">لا توجد نتائج</td></tr>
+              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">لا توجد نتائج</td></tr>
             )}
           </tbody>
         </table>

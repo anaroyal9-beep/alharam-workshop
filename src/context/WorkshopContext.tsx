@@ -23,6 +23,9 @@ export interface MaintenanceRecord {
   deliveryDate?: string;
   isCompleted: boolean;
   isPaid: boolean;
+  isUnderWarranty: boolean;
+  beforePhoto?: string;
+  afterPhoto?: string;
   spareParts: SparePart[];
   laborFee: number;
   notes?: string;
@@ -61,24 +64,24 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [records, setRecords] = useState<MaintenanceRecord[]>([
     {
       id: "r1", maintenanceId: "MNT-001", customerId: "c1", itemName: "مكيف سبليت", itemId: "ITM-001",
-      receivedDate: "2026-03-20", isCompleted: false, isPaid: false,
+      receivedDate: "2026-03-20", isCompleted: false, isPaid: false, isUnderWarranty: false,
       spareParts: [{ id: "sp1", name: "كمبروسر", price: 450 }, { id: "sp2", name: "فلتر", price: 80 }],
       laborFee: 200, notes: "يحتاج تنظيف شامل"
     },
     {
       id: "r2", maintenanceId: "MNT-002", customerId: "c2", itemName: "غسالة أوتوماتيك", itemId: "ITM-002",
-      receivedDate: "2026-03-18", deliveryDate: "2026-03-22", isCompleted: true, isPaid: true,
+      receivedDate: "2026-03-18", deliveryDate: "2026-03-22", isCompleted: true, isPaid: true, isUnderWarranty: true,
       spareParts: [{ id: "sp3", name: "موتور", price: 600 }],
       laborFee: 150
     },
     {
       id: "r3", maintenanceId: "MNT-003", customerId: "c1", itemName: "ثلاجة", itemId: "ITM-003",
-      receivedDate: "2026-03-22", isCompleted: false, isPaid: false,
+      receivedDate: "2026-03-22", isCompleted: false, isPaid: false, isUnderWarranty: false,
       spareParts: [], laborFee: 100
     },
     {
       id: "r4", maintenanceId: "MNT-004", customerId: "c3", itemName: "مكنسة كهربائية", itemId: "ITM-004",
-      receivedDate: "2026-03-15", deliveryDate: "2026-03-19", isCompleted: true, isPaid: false,
+      receivedDate: "2026-03-15", deliveryDate: "2026-03-19", isCompleted: true, isPaid: false, isUnderWarranty: true,
       spareParts: [{ id: "sp4", name: "خرطوم", price: 120 }],
       laborFee: 80
     },
