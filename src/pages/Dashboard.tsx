@@ -1,6 +1,7 @@
 import { useWorkshop } from "@/context/WorkshopContext";
 import StatCard from "@/components/StatCard";
-import { Wrench, AlertCircle, CheckCircle, BanknoteIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Wrench, AlertCircle, CheckCircle, BanknoteIcon, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -10,16 +11,18 @@ const Dashboard = () => {
   const pending = records.filter((r) => !r.isCompleted);
   const completed = records.filter((r) => r.isCompleted);
   const unpaid = records.filter((r) => !r.isPaid);
+  const underWarranty = records.filter((r) => r.isUnderWarranty);
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-extrabold">لوحة التحكم</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard title="إجمالي الطلبات" value={records.length} icon={Wrench} variant="primary" />
         <StatCard title="قيد الصيانة" value={pending.length} icon={AlertCircle} variant="secondary" />
         <StatCard title="مكتملة" value={completed.length} icon={CheckCircle} variant="accent" />
         <StatCard title="غير مدفوعة" value={unpaid.length} icon={BanknoteIcon} variant="destructive" />
+        <StatCard title="تحت الضمان" value={underWarranty.length} icon={ShieldCheck} variant="primary" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -44,9 +47,15 @@ const Dashboard = () => {
                       <p className="font-medium">{r.itemName}</p>
                       <p className="text-sm text-muted-foreground">{customer?.name} • {r.maintenanceId}</p>
                     </div>
-                    <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full font-medium">
-                      قيد الصيانة
-                    </span>
+                    <div className="flex gap-2">
+                      <Badge className="bg-red-500/15 text-red-600 border-red-500/30">قيد الانتظار</Badge>
+                      <Badge className={r.isPaid
+                        ? "bg-green-500/15 text-green-600 border-green-500/30"
+                        : "bg-red-500/15 text-red-600 border-red-500/30"
+                      }>
+                        {r.isPaid ? "مدفوع" : "غير مدفوع"}
+                      </Badge>
+                    </div>
                   </div>
                 );
               })
@@ -76,7 +85,15 @@ const Dashboard = () => {
                       <p className="font-medium">{r.itemName}</p>
                       <p className="text-sm text-muted-foreground">{customer?.name}</p>
                     </div>
-                    <span className="font-bold text-destructive">{total} ر.س</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-destructive">{total} ر.س</span>
+                      <Badge className={r.isCompleted
+                        ? "bg-green-500/15 text-green-600 border-green-500/30"
+                        : "bg-red-500/15 text-red-600 border-red-500/30"
+                      }>
+                        {r.isCompleted ? "مكتملة" : "قيد الانتظار"}
+                      </Badge>
+                    </div>
                   </div>
                 );
               })

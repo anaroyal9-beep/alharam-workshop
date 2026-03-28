@@ -45,6 +45,7 @@ const NewMaintenance = () => {
       receivedDate: new Date().toISOString().split("T")[0],
       isCompleted: false,
       isPaid: false,
+      isUnderWarranty: false,
       spareParts: [],
       laborFee: 0,
       notes: notes || undefined,
