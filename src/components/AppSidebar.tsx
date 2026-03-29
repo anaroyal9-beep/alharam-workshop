@@ -27,8 +27,8 @@ const AppSidebar = () => {
             <h1 className="text-base text-white leading-snug font-sans text-right font-semibold">
               ​AL HARAM PERFECT WORKSHOP   
             </h1>
-            <p className="text-xs font-bold text-white/70 mt-0.5 leading-tight">
-              للآلات والمعدات
+            <p className="font-bold text-white/70 mt-0.5 leading-tight font-serif text-sm">
+              ​ورشة الهرم المثالى للصيانة   
             </p>
           </div>
         </div>
