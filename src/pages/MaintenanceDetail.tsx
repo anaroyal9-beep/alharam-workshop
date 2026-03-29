@@ -29,16 +29,21 @@ const StatusCircle = ({
 }) => (
   <button
     onClick={onClick}
-    className="print:pointer-events-none transition-all"
+    className="print:pointer-events-none transition-all flex-shrink-0"
     aria-label="تبديل الحالة"
   >
     {active ? (
-      <div className="w-8 h-8 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-md print:shadow-none">
-        <CheckCircle2 className="w-5 h-5 text-white" strokeWidth={2.5} />
+      <div className="w-8 h-8 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-md print:shadow-none print:border-2 print:border-[hsl(var(--success))]">
+        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
       </div>
     ) : (
-      <div className="w-8 h-8 rounded-full border-[3px] border-[hsl(var(--destructive))] flex items-center justify-center">
-        <AlertCircle className="w-4 h-4 text-[hsl(var(--destructive))]" strokeWidth={2.5} />
+      <div className="w-8 h-8 rounded-full border-[3px] border-[hsl(var(--destructive))] flex items-center justify-center print:border-2">
+        <svg className="w-3.5 h-3.5 text-[hsl(var(--destructive))]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </div>
     )}
   </button>

@@ -17,6 +17,8 @@ const NewMaintenance = () => {
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newCompany, setNewCompany] = useState("");
+  const [maintenanceId, setMaintenanceId] = useState("");
+  const [receivedDate, setReceivedDate] = useState(new Date().toISOString().split("T")[0]);
   const [itemName, setItemName] = useState("");
   const [itemId, setItemId] = useState("");
   const [notes, setNotes] = useState("");
@@ -35,14 +37,14 @@ const NewMaintenance = () => {
     }
     if (!custId) { toast.error("يرجى اختيار عميل"); return; }
     if (!itemName) { toast.error("يرجى إدخال اسم الجهاز"); return; }
+    if (!maintenanceId.trim()) { toast.error("يرجى إدخال رقم الصيانة"); return; }
 
-    const maintenanceId = generateMaintenanceId();
     const record = addRecord({
-      maintenanceId,
+      maintenanceId: maintenanceId.trim(),
       customerId: custId,
       itemName,
       itemId: itemId || `ITM-${Date.now()}`,
-      receivedDate: new Date().toISOString().split("T")[0],
+      receivedDate,
       isCompleted: false,
       isPaid: false,
       isUnderWarranty: false,
@@ -59,6 +61,21 @@ const NewMaintenance = () => {
       <h2 className="text-2xl font-bold">طلب صيانة جديد</h2>
 
       <div className="bg-card rounded-lg shadow-sm border border-border p-6 space-y-5">
+        {/* Maintenance Number & Date */}
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">بيانات الصيانة</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-sm text-muted-foreground">رقم الصيانة</Label>
+              <Input placeholder="أدخل رقم الصيانة" value={maintenanceId} onChange={(e) => setMaintenanceId(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-sm text-muted-foreground">التاريخ</Label>
+              <Input type="date" value={receivedDate} onChange={(e) => setReceivedDate(e.target.value)} />
+            </div>
+          </div>
+        </div>
+
         {/* Customer Selection */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">العميل</Label>
