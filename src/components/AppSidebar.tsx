@@ -17,14 +17,14 @@ const AppSidebar = () => {
   return (
     <aside className="w-72 min-h-screen bg-sidebar flex flex-col shrink-0">
       <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-[16px]">
           <img
 
             alt="شعار ورشة الهرم المثالي"
-            className="w-14 h-14 rounded-xl object-contain p-1 shrink-0 bg-transparent" src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png" />
+            className="w-14 h-14 p-1 shrink-0 bg-transparent object-cover py-px px-[4px] rounded-none text-3xl" src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png" />
           
           <div className="min-w-0">
-            <h1 className="text-base text-white leading-snug font-sans text-right font-semibold">
+            <h1 className="text-white leading-snug font-sans text-sm font-bold text-left">
               ​AL HARAM PERFECT WORKSHOP   
             </h1>
             <p className="font-bold text-white/70 mt-0.5 leading-tight font-serif text-sm">
