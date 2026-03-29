@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
 
 const links = [
-  { to: "/", label: "لوحة التحكم", icon: LayoutDashboard },
-  { to: "/maintenance/new", label: "طلب صيانة جديد", icon: Plus },
-  { to: "/records", label: "سجلات الصيانة", icon: Wrench },
-  { to: "/customers", label: "العملاء", icon: Users },
-  { to: "/search", label: "البحث المتقدم", icon: Search },
-];
+{ to: "/", label: "لوحة التحكم", icon: LayoutDashboard },
+{ to: "/maintenance/new", label: "طلب صيانة جديد", icon: Plus },
+{ to: "/records", label: "سجلات الصيانة", icon: Wrench },
+{ to: "/customers", label: "العملاء", icon: Users },
+{ to: "/search", label: "البحث المتقدم", icon: Search }];
+
 
 const AppSidebar = () => {
   const location = useLocation();
@@ -21,11 +21,11 @@ const AppSidebar = () => {
           <img
             src={logo}
             alt="شعار ورشة الهرم المثالي"
-            className="w-14 h-14 rounded-xl object-contain bg-white p-1 shrink-0"
-          />
+            className="w-14 h-14 rounded-xl object-contain bg-white p-1 shrink-0" />
+          
           <div className="min-w-0">
-            <h1 className="text-base font-extrabold text-white leading-snug">
-              ورشة الهرم المثالي
+            <h1 className="text-base text-white leading-snug font-sans text-right font-semibold">
+              ​AL HARAM PERFECT WORKSHOP   
             </h1>
             <p className="text-xs font-bold text-white/70 mt-0.5 leading-tight">
               للآلات والمعدات
@@ -42,22 +42,22 @@ const AppSidebar = () => {
               to={link.to}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors",
-                isActive
-                  ? "bg-sidebar-primary text-white shadow-md"
-                  : "text-white/80 hover:bg-sidebar-accent hover:text-white"
-              )}
-            >
+                isActive ?
+                "bg-sidebar-primary text-white shadow-md" :
+                "text-white/80 hover:bg-sidebar-accent hover:text-white"
+              )}>
+              
               <link.icon className="w-5 h-5" />
               {link.label}
-            </NavLink>
-          );
+            </NavLink>);
+
         })}
       </nav>
       <div className="p-4 border-t border-sidebar-border text-xs text-white/40 text-center font-bold">
         © 2026 ورشة الهرم المثالي للآلات والمعدات
       </div>
-    </aside>
-  );
+    </aside>);
+
 };
 
 export default AppSidebar;
