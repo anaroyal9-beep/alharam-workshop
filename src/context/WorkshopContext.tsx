@@ -26,6 +26,7 @@ export interface MaintenanceRecord {
   isUnderWarranty: boolean;
   beforePhoto?: string;
   afterPhoto?: string;
+  additionalPhotos?: string[];
   spareParts: SparePart[];
   laborFee: number;
   notes?: string;

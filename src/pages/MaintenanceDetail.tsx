@@ -3,7 +3,6 @@ import { useWorkshop, SparePart } from "@/context/WorkshopContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import {
@@ -12,35 +11,37 @@ import {
   Camera,
   CheckCircle2,
   AlertCircle,
-  Clock,
   Wrench,
   ShieldCheck,
   ShieldX,
+  ImagePlus,
+  X,
+  DollarSign,
 } from "lucide-react";
 
-const StatusBadge = ({
+/* ── Clickable status circle ─────────────────────────────── */
+const StatusCircle = ({
   active,
-  activeIcon: ActiveIcon,
-  inactiveIcon: InactiveIcon,
-  activeLabel,
-  inactiveLabel,
+  onClick,
 }: {
   active: boolean;
-  activeIcon: React.ElementType;
-  inactiveIcon: React.ElementType;
-  activeLabel: string;
-  inactiveLabel: string;
+  onClick: () => void;
 }) => (
-  <div
-    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold print:border ${
-      active
-        ? "bg-[hsl(var(--success)/0.12)] text-[hsl(var(--success))] print:border-[hsl(var(--success))]"
-        : "bg-[hsl(var(--destructive)/0.12)] text-[hsl(var(--destructive))] print:border-[hsl(var(--destructive))]"
-    }`}
+  <button
+    onClick={onClick}
+    className="print:pointer-events-none transition-all"
+    aria-label="تبديل الحالة"
   >
-    {active ? <ActiveIcon className="w-4 h-4" /> : <InactiveIcon className="w-4 h-4" />}
-    {active ? activeLabel : inactiveLabel}
-  </div>
+    {active ? (
+      <div className="w-8 h-8 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-md print:shadow-none">
+        <CheckCircle2 className="w-5 h-5 text-white" strokeWidth={2.5} />
+      </div>
+    ) : (
+      <div className="w-8 h-8 rounded-full border-[3px] border-[hsl(var(--destructive))] flex items-center justify-center">
+        <AlertCircle className="w-4 h-4 text-[hsl(var(--destructive))]" strokeWidth={2.5} />
+      </div>
+    )}
+  </button>
 );
 
 const MaintenanceDetail = () => {
@@ -52,8 +53,12 @@ const MaintenanceDetail = () => {
   const [newPartName, setNewPartName] = useState("");
   const [newPartPrice, setNewPartPrice] = useState("");
   const [laborFee, setLaborFee] = useState(record?.laborFee?.toString() || "0");
+  const [editMaintenanceId, setEditMaintenanceId] = useState(record?.maintenanceId || "");
+  const [editReceivedDate, setEditReceivedDate] = useState(record?.receivedDate || "");
+
   const beforePhotoRef = useRef<HTMLInputElement>(null);
   const afterPhotoRef = useRef<HTMLInputElement>(null);
+  const additionalPhotoRef = useRef<HTMLInputElement>(null);
 
   if (!record) {
     return (
@@ -98,22 +103,54 @@ const MaintenanceDetail = () => {
     const reader = new FileReader();
     reader.onload = () => {
       updateRecord(record.id, { [type]: reader.result as string });
-      toast.success(
-        type === "beforePhoto" ? "تم رفع صورة قبل الصيانة" : "تم رفع صورة بعد الصيانة"
-      );
+      toast.success(type === "beforePhoto" ? "تم رفع صورة قبل الصيانة" : "تم رفع صورة بعد الصيانة");
     };
     reader.readAsDataURL(file);
   };
 
+  const handleAdditionalPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const existing = record.additionalPhotos || [];
+        updateRecord(record.id, { additionalPhotos: [...existing, reader.result as string] });
+      };
+      reader.readAsDataURL(file);
+    });
+    toast.success("تم رفع الصور الإضافية");
+  };
+
+  const removeAdditionalPhoto = (index: number) => {
+    const updated = [...(record.additionalPhotos || [])];
+    updated.splice(index, 1);
+    updateRecord(record.id, { additionalPhotos: updated });
+  };
+
+  const saveMaintenanceId = () => {
+    if (editMaintenanceId && editMaintenanceId !== record.maintenanceId) {
+      updateRecord(record.id, { maintenanceId: editMaintenanceId });
+      toast.success("تم تحديث رقم الصيانة");
+    }
+  };
+
+  const saveReceivedDate = () => {
+    if (editReceivedDate && editReceivedDate !== record.receivedDate) {
+      updateRecord(record.id, { receivedDate: editReceivedDate });
+      toast.success("تم تحديث تاريخ الاستلام");
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+    <div className="max-w-4xl mx-auto space-y-6 pb-8 print:max-w-none print:p-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between print:hidden">
         <h2 className="text-2xl font-bold text-foreground">تفاصيل الصيانة</h2>
         <Button
           variant="outline"
           size="sm"
-          className="rounded-lg shadow-sm print:hidden"
+          className="rounded-lg shadow-sm"
           onClick={() => window.print()}
         >
           <Printer className="w-4 h-4 ml-2" />
@@ -121,17 +158,29 @@ const MaintenanceDetail = () => {
         </Button>
       </div>
 
-      {/* Customer & Device Info */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6">
+      {/* Print Header */}
+      <div className="hidden print:block text-center border-b-2 border-foreground pb-4 mb-6">
+        <h1 className="text-2xl font-extrabold">ورشة الهرم المثالي</h1>
+        <p className="text-sm text-muted-foreground">تقرير صيانة</p>
+      </div>
+
+      {/* Customer & Device Info — editable fields */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:border print:rounded-none">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Maintenance ID — editable */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">رقم الصيانة</p>
-            <p className="font-bold text-lg font-mono text-foreground">{record.maintenanceId}</p>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block">رقم الصيانة</Label>
+            <Input
+              value={editMaintenanceId}
+              onChange={(e) => setEditMaintenanceId(e.target.value)}
+              onBlur={saveMaintenanceId}
+              className="font-bold text-lg font-mono rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent"
+            />
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-1">العميل</p>
             <p
-              className="font-semibold text-primary cursor-pointer hover:underline"
+              className="font-semibold text-primary cursor-pointer hover:underline print:cursor-default print:no-underline"
               onClick={() => navigate(`/customers/${record.customerId}`)}
             >
               {customer?.name}
@@ -143,9 +192,16 @@ const MaintenanceDetail = () => {
             <p className="font-semibold text-foreground">{record.itemName}</p>
             <p className="text-xs text-muted-foreground font-mono">{record.itemId}</p>
           </div>
+          {/* Received Date — editable */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">تاريخ الاستلام</p>
-            <p className="font-semibold text-foreground">{record.receivedDate}</p>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block">تاريخ الاستلام</Label>
+            <Input
+              type="date"
+              value={editReceivedDate}
+              onChange={(e) => setEditReceivedDate(e.target.value)}
+              onBlur={saveReceivedDate}
+              className="rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent"
+            />
             {record.deliveryDate && (
               <>
                 <p className="text-xs font-medium text-muted-foreground mt-2 mb-1">تاريخ التسليم</p>
@@ -156,116 +212,91 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
-      {/* Status Overview */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5">
+      {/* Status Overview — clickable circles */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none">
         <h3 className="font-bold text-foreground">حالة الطلب</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {/* Maintenance Status */}
-          <div className="bg-muted/40 rounded-lg p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-foreground" />
-                <span className="text-sm font-semibold text-foreground">الصيانة</span>
+          {/* Maintenance */}
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border">
+            <div className="flex items-center gap-3">
+              <Wrench className="w-5 h-5 text-muted-foreground" />
+              <div>
+                <span className="text-sm font-semibold text-foreground block">الصيانة</span>
+                <span className={`text-xs font-semibold ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                  {record.isCompleted ? "مكتملة" : "قيد الانتظار"}
+                </span>
               </div>
-              <button
-                className="print:hidden"
-                onClick={() =>
-                  updateRecord(record.id, {
-                    isCompleted: !record.isCompleted,
-                    deliveryDate: !record.isCompleted ? new Date().toISOString().split("T")[0] : undefined,
-                  })
-                }
-              >
-                {record.isCompleted ? (
-                  <div className="w-7 h-7 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-sm">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                  </div>
-                ) : (
-                  <div className="w-7 h-7 rounded-full bg-[hsl(var(--destructive))] flex items-center justify-center shadow-sm">
-                    <AlertCircle className="w-4 h-4 text-white" />
-                  </div>
-                )}
-              </button>
             </div>
-            <StatusBadge
+            <StatusCircle
               active={record.isCompleted}
-              activeIcon={Wrench}
-              inactiveIcon={Clock}
-              activeLabel="مكتملة"
-              inactiveLabel="قيد الانتظار"
+              onClick={() =>
+                updateRecord(record.id, {
+                  isCompleted: !record.isCompleted,
+                  deliveryDate: !record.isCompleted ? new Date().toISOString().split("T")[0] : undefined,
+                })
+              }
             />
           </div>
 
-          {/* Payment Status */}
-          <div className="bg-muted/40 rounded-lg p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-foreground">الدفع</span>
-            </div>
-            {record.isPaid ? (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-[hsl(var(--success))] flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">$</span>
+          {/* Payment */}
+          <div className="bg-muted/40 rounded-lg p-4 space-y-3 print:bg-transparent print:border print:border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <DollarSign className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-semibold text-foreground block">الدفع</span>
+                  <span className={`text-xs font-semibold ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                    {record.isPaid ? "مدفوع" : "غير مدفوع"}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-[hsl(var(--success))]">مدفوع</span>
               </div>
-            ) : (
-              <StatusBadge
-                active={false}
-                activeIcon={CheckCircle2}
-                inactiveIcon={AlertCircle}
-                activeLabel="مدفوع"
-                inactiveLabel="غير مدفوع"
+              <StatusCircle
+                active={record.isPaid}
+                onClick={() => {
+                  updateRecord(record.id, { isPaid: !record.isPaid });
+                  toast.success(record.isPaid ? "تم إلغاء الدفع" : "تم تسجيل الدفع");
+                }}
               />
-            )}
-            <div className="print:hidden">
-              {!record.isPaid ? (
-                <Button
-                  size="sm"
-                  className="w-full rounded-lg shadow-sm"
-                  onClick={() => {
-                    updateRecord(record.id, { isPaid: true });
-                    toast.success("تم تسجيل الدفع");
-                  }}
-                >
-                  <CheckCircle2 className="w-4 h-4 ml-2" />
-                  ادفع الآن
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full rounded-lg"
-                  onClick={() => updateRecord(record.id, { isPaid: false })}
-                >
-                  إلغاء الدفع
-                </Button>
-              )}
             </div>
+            {!record.isPaid && (
+              <Button
+                size="sm"
+                className="w-full rounded-lg shadow-sm print:hidden"
+                onClick={() => {
+                  updateRecord(record.id, { isPaid: true });
+                  toast.success("تم تسجيل الدفع");
+                }}
+              >
+                ادفع الآن
+              </Button>
+            )}
           </div>
 
-          {/* Warranty Status */}
-          <div className="bg-muted/40 rounded-lg p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-foreground">الضمان</span>
-              <Switch
-                className="print:hidden"
-                checked={record.isUnderWarranty}
-                onCheckedChange={(v) => updateRecord(record.id, { isUnderWarranty: v })}
-              />
+          {/* Warranty */}
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border">
+            <div className="flex items-center gap-3">
+              {record.isUnderWarranty ? (
+                <ShieldCheck className="w-5 h-5 text-[hsl(var(--success))]" />
+              ) : (
+                <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))]" />
+              )}
+              <div>
+                <span className="text-sm font-semibold text-foreground block">الضمان</span>
+                <span className={`text-xs font-semibold ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                  {record.isUnderWarranty ? "تحت الضمان" : "بدون ضمان"}
+                </span>
+              </div>
             </div>
-            <StatusBadge
+            <StatusCircle
               active={record.isUnderWarranty}
-              activeIcon={ShieldCheck}
-              inactiveIcon={ShieldX}
-              activeLabel="تحت الضمان"
-              inactiveLabel="بدون ضمان"
+              onClick={() => updateRecord(record.id, { isUnderWarranty: !record.isUnderWarranty })}
             />
           </div>
         </div>
       </section>
 
       {/* Photo Documentation */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4">
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:border print:rounded-none">
         <h3 className="font-bold text-foreground">توثيق بالصور</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Before Photo */}
@@ -280,11 +311,7 @@ const MaintenanceDetail = () => {
             />
             {record.beforePhoto ? (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img
-                  src={record.beforePhoto}
-                  alt="قبل الصيانة"
-                  className="w-full h-52 object-cover"
-                />
+                <img src={record.beforePhoto} alt="قبل الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-48" />
                 <button
                   onClick={() => beforePhotoRef.current?.click()}
                   className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
@@ -316,11 +343,7 @@ const MaintenanceDetail = () => {
             />
             {record.afterPhoto ? (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img
-                  src={record.afterPhoto}
-                  alt="بعد الصيانة"
-                  className="w-full h-52 object-cover"
-                />
+                <img src={record.afterPhoto} alt="بعد الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-48" />
                 <button
                   onClick={() => afterPhotoRef.current?.click()}
                   className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
@@ -340,10 +363,45 @@ const MaintenanceDetail = () => {
             )}
           </div>
         </div>
+
+        {/* Additional Photos */}
+        {(record.additionalPhotos?.length ?? 0) > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
+            {record.additionalPhotos!.map((photo, i) => (
+              <div key={i} className="relative group rounded-lg border border-border overflow-hidden">
+                <img src={photo} alt={`صورة إضافية ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-32" />
+                <button
+                  onClick={() => removeAdditionalPhoto(i)}
+                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <input
+          ref={additionalPhotoRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleAdditionalPhotos}
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-lg print:hidden"
+          onClick={() => additionalPhotoRef.current?.click()}
+        >
+          <ImagePlus className="w-4 h-4 ml-2" />
+          إضافة صور أخرى
+        </Button>
       </section>
 
       {/* Spare Parts */}
-      <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+      <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden print:shadow-none print:rounded-none">
         <div className="p-5 border-b border-border">
           <h3 className="font-bold text-foreground">قطع الغيار</h3>
         </div>
@@ -397,7 +455,7 @@ const MaintenanceDetail = () => {
       </section>
 
       {/* Cost Summary */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4">
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:rounded-none">
         <h3 className="font-bold text-foreground">ملخص التكلفة</h3>
         <div className="flex items-center gap-3 print:hidden">
           <Label className="text-sm font-semibold">أجرة الصيانة:</Label>
@@ -428,7 +486,7 @@ const MaintenanceDetail = () => {
 
       {/* Notes */}
       {record.notes && (
-        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:rounded-none">
           <h3 className="font-bold text-foreground mb-2">ملاحظات</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{record.notes}</p>
         </section>
