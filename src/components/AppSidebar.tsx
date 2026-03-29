@@ -25,9 +25,9 @@ const AppSidebar = () => {
           
           <div className="min-w-0">
             <h1 className="text-white leading-snug font-sans text-sm font-bold text-left">
-              ​AL HARAM PERFECT WORKSHOP   
+              ​AL HARAM WORKSHOP   
             </h1>
-            <p className="font-bold text-white/70 mt-0.5 leading-tight font-serif text-sm">
+            <p className="text-white/70 mt-0.5 leading-tight font-serif text-sm font-normal">
               ​ورشة الهرم المثالى للصيانة   
             </p>
           </div>
