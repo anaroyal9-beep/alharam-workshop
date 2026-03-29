@@ -71,20 +71,28 @@
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
   body {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    font-size: 12pt;
   }
 
   .print\:hidden {
     display: none !important;
   }
 
-  /* Hide sidebar and nav during print */
   aside,
   nav,
-  [data-sidebar] {
+  header,
+  footer,
+  [data-sidebar],
+  button:not(.print-visible) {
     display: none !important;
   }
 
@@ -102,5 +110,12 @@
   img {
     max-height: 200px;
     object-fit: cover;
+  }
+
+  input {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
   }
 }
