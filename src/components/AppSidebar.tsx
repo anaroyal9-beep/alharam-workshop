@@ -19,9 +19,9 @@ const AppSidebar = () => {
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-4">
           <img
-            src={logo}
+
             alt="شعار ورشة الهرم المثالي"
-            className="w-14 h-14 rounded-xl object-contain bg-white p-1 shrink-0" />
+            className="w-14 h-14 rounded-xl object-contain p-1 shrink-0 bg-transparent" src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png" />
           
           <div className="min-w-0">
             <h1 className="text-base text-white leading-snug font-sans text-right font-semibold">
