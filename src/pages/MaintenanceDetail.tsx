@@ -8,8 +8,6 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import {
   Trash2,
-  Printer,
-  Camera,
   Wrench,
   ShieldCheck,
   ShieldX,
