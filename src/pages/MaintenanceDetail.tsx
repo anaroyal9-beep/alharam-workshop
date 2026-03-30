@@ -376,7 +376,7 @@ const MaintenanceDetail = () => {
           accept="image/*"
           multiple
           className="hidden"
-          onChange={handleAdditionalPhotos}
+          onChange={handlePhotoUpload}
         />
         <Button
           variant="outline"
