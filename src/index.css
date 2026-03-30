@@ -70,33 +70,34 @@
   }
 }
 
+/* ── Print styles ──────────────────────────────────────────── */
 @media print {
   @page {
     size: A4;
-    margin: 15mm;
+    margin: 10mm;
   }
 
   body {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 12pt;
+    font-size: 10pt;
   }
 
-  .print\:hidden {
-    display: none !important;
-  }
-
+  /* Hide all web chrome */
+  .print\:hidden,
   aside,
   nav,
   header,
   footer,
   [data-sidebar],
-  button:not(.print-visible):not([aria-label="تبديل الحالة"]) {
+  [data-lovable-badge] {
     display: none !important;
   }
 
-  [aria-label="تبديل الحالة"] {
+  /* Keep status circles visible */
+  .status-circle {
+    display: flex !important;
     pointer-events: none !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -114,14 +115,24 @@
   }
 
   img {
-    max-height: 200px;
+    max-height: 160px;
     object-fit: cover;
   }
 
-  input {
+  input, textarea {
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
     background: transparent !important;
+  }
+
+  /* ── Quotation mode: hide photos & failure analysis, single page ── */
+  .print-quotation .print-quotation-hide {
+    display: none !important;
+  }
+
+  /* ── Technical mode: hide photo section if no photos ── */
+  .print-technical .print-no-photos-hide {
+    display: none !important;
   }
 }
