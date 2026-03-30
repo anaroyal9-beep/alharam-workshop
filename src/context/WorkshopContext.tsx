@@ -30,6 +30,7 @@ export interface MaintenanceRecord {
   spareParts: SparePart[];
   laborFee: number;
   notes?: string;
+  failureAnalysis?: string;
 }
 
 interface WorkshopContextType {
