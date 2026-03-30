@@ -8,8 +8,6 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import {
   Trash2,
-  Printer,
-  Camera,
   Wrench,
   ShieldCheck,
   ShieldX,
@@ -67,8 +65,6 @@ const MaintenanceDetail = () => {
   const [failureAnalysis, setFailureAnalysis] = useState(record?.failureAnalysis || "");
   const [printMode, setPrintMode] = useState<PrintMode>("none");
 
-  const beforePhotoRef = useRef<HTMLInputElement>(null);
-  const afterPhotoRef = useRef<HTMLInputElement>(null);
   const additionalPhotoRef = useRef<HTMLInputElement>(null);
 
   if (!record) {
@@ -82,6 +78,11 @@ const MaintenanceDetail = () => {
   const total = partsTotal + record.laborFee;
 
   const hasPhotos = !!(record.beforePhoto || record.afterPhoto || (record.additionalPhotos?.length ?? 0) > 0);
+
+  const allPhotos: { src: string; removeAction: () => void }[] = [];
+  if (record.beforePhoto) allPhotos.push({ src: record.beforePhoto, removeAction: () => updateRecord(record.id, { beforePhoto: undefined }) });
+  if (record.afterPhoto) allPhotos.push({ src: record.afterPhoto, removeAction: () => updateRecord(record.id, { afterPhoto: undefined }) });
+  (record.additionalPhotos || []).forEach((p, i) => allPhotos.push({ src: p, removeAction: () => removeAdditionalPhoto(i) }));
 
   const addPart = () => {
     if (!newPartName || !newPartPrice) return;
@@ -107,21 +108,7 @@ const MaintenanceDetail = () => {
     toast.success("تم تحديث أجرة الصيانة");
   };
 
-  const handlePhotoUpload = (
-    type: "beforePhoto" | "afterPhoto",
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      updateRecord(record.id, { [type]: reader.result as string });
-      toast.success(type === "beforePhoto" ? "تم رفع صورة قبل الصيانة" : "تم رفع صورة بعد الصيانة");
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleAdditionalPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     Array.from(files).forEach((file) => {
@@ -132,8 +119,9 @@ const MaintenanceDetail = () => {
       };
       reader.readAsDataURL(file);
     });
-    toast.success("تم رفع الصور الإضافية");
+    toast.success("تم رفع الصور");
   };
+
 
   const removeAdditionalPhoto = (index: number) => {
     const updated = [...(record.additionalPhotos || [])];
@@ -283,37 +271,23 @@ const MaintenanceDetail = () => {
           </div>
 
           {/* Payment */}
-          <div className="bg-muted/40 rounded-lg p-4 space-y-3 print:bg-transparent print:border print:border-border print:p-2 print:space-y-1">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 print:gap-1">
-                <DollarSign className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
-                <div>
-                  <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الدفع</span>
-                  <span className={`text-xs font-semibold print:text-[9pt] ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
-                    {record.isPaid ? "مدفوع" : "غير مدفوع"}
-                  </span>
-                </div>
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
+            <div className="flex items-center gap-3 print:gap-1">
+              <DollarSign className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
+              <div>
+                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الدفع</span>
+                <span className={`text-xs font-semibold print:text-[9pt] ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                  {record.isPaid ? "مدفوع" : "غير مدفوع"}
+                </span>
               </div>
-              <StatusCircle
-                active={record.isPaid}
-                onClick={() => {
-                  updateRecord(record.id, { isPaid: !record.isPaid });
-                  toast.success(record.isPaid ? "تم إلغاء الدفع" : "تم تسجيل الدفع");
-                }}
-              />
             </div>
-            {!record.isPaid && (
-              <Button
-                size="sm"
-                className="w-full rounded-lg shadow-sm print:hidden"
-                onClick={() => {
-                  updateRecord(record.id, { isPaid: true });
-                  toast.success("تم تسجيل الدفع");
-                }}
-              >
-                ادفع الآن
-              </Button>
-            )}
+            <StatusCircle
+              active={record.isPaid}
+              onClick={() => {
+                updateRecord(record.id, { isPaid: !record.isPaid });
+                toast.success(record.isPaid ? "تم إلغاء الدفع" : "تم تسجيل الدفع");
+              }}
+            />
           </div>
 
           {/* Warranty */}
@@ -340,7 +314,7 @@ const MaintenanceDetail = () => {
       </section>
 
       {/* Failure Analysis - Technical Report section */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide">
+      <section className={`bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide ${!failureAnalysis.trim() ? 'print-no-photos-hide' : ''}`}>
         <h3 className="font-bold text-foreground print:text-[11pt]">أسباب العطل</h3>
         <Textarea
           value={failureAnalysis}
@@ -351,84 +325,41 @@ const MaintenanceDetail = () => {
         />
       </section>
 
-      {/* Photo Documentation */}
+      {/* Photo Documentation - Single unified section */}
       <section className={`bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide ${!hasPhotos ? 'print-no-photos-hide' : ''}`}>
-        <h3 className="font-bold text-foreground print:text-[11pt]">توثيق بالصور</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:gap-3">
-          {/* Before Photo */}
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground print:text-[10pt]">صورة قبل الصيانة</Label>
-            <input
-              ref={beforePhotoRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handlePhotoUpload("beforePhoto", e)}
-            />
-            {record.beforePhoto ? (
+        <h3 className="font-bold text-foreground print:text-[11pt]">صور الصيانة</h3>
+
+        {/* All photos grid */}
+        {hasPhotos && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
+            {record.beforePhoto && (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.beforePhoto} alt="قبل الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-40" />
+                <img src={record.beforePhoto} alt="صورة صيانة" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
                 <button
-                  onClick={() => beforePhotoRef.current?.click()}
-                  className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
+                  onClick={() => updateRecord(record.id, { beforePhoto: undefined })}
+                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <Camera className="w-5 h-5 ml-2" />
-                  تغيير الصورة
+                  <X className="w-3 h-3" />
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => beforePhotoRef.current?.click()}
-                className="print:hidden w-full h-52 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-              >
-                <Camera className="w-8 h-8" />
-                <span className="text-sm font-medium">رفع صورة</span>
-              </button>
             )}
-          </div>
-
-          {/* After Photo */}
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground print:text-[10pt]">صورة بعد الصيانة</Label>
-            <input
-              ref={afterPhotoRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handlePhotoUpload("afterPhoto", e)}
-            />
-            {record.afterPhoto ? (
+            {record.afterPhoto && (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.afterPhoto} alt="بعد الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-40" />
+                <img src={record.afterPhoto} alt="صورة صيانة" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
                 <button
-                  onClick={() => afterPhotoRef.current?.click()}
-                  className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
+                  onClick={() => updateRecord(record.id, { afterPhoto: undefined })}
+                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <Camera className="w-5 h-5 ml-2" />
-                  تغيير الصورة
+                  <X className="w-3 h-3" />
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => afterPhotoRef.current?.click()}
-                className="print:hidden w-full h-52 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-              >
-                <Camera className="w-8 h-8" />
-                <span className="text-sm font-medium">رفع صورة</span>
-              </button>
             )}
-          </div>
-        </div>
-
-        {/* Additional Photos */}
-        {(record.additionalPhotos?.length ?? 0) > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4 print:grid-cols-4 print:gap-2">
-            {record.additionalPhotos!.map((photo, i) => (
+            {record.additionalPhotos?.map((photo, i) => (
               <div key={i} className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={photo} alt={`صورة إضافية ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+                <img src={photo} alt={`صورة ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
                 <button
                   onClick={() => removeAdditionalPhoto(i)}
-                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -443,7 +374,7 @@ const MaintenanceDetail = () => {
           accept="image/*"
           multiple
           className="hidden"
-          onChange={handleAdditionalPhotos}
+          onChange={handlePhotoUpload}
         />
         <Button
           variant="outline"
@@ -452,7 +383,7 @@ const MaintenanceDetail = () => {
           onClick={() => additionalPhotoRef.current?.click()}
         >
           <ImagePlus className="w-4 h-4 ml-2" />
-          إضافة صور أخرى
+          إضافة صور
         </Button>
       </section>
 
