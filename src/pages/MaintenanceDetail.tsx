@@ -3,21 +3,23 @@ import { useWorkshop, SparePart } from "@/context/WorkshopContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import {
   Trash2,
   Printer,
   Camera,
-  CheckCircle2,
-  AlertCircle,
   Wrench,
   ShieldCheck,
   ShieldX,
   ImagePlus,
   X,
   DollarSign,
+  FileText,
+  FileBarChart,
 } from "lucide-react";
+import PrintHeader from "@/components/PrintHeader";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
@@ -29,12 +31,12 @@ const StatusCircle = ({
 }) => (
   <button
     onClick={onClick}
-    className="print:pointer-events-none transition-all flex-shrink-0"
+    className="status-circle print:pointer-events-none transition-all flex-shrink-0"
     aria-label="تبديل الحالة"
   >
     {active ? (
       <div className="w-8 h-8 rounded-full bg-[hsl(var(--success))] flex items-center justify-center shadow-md print:shadow-none print:border-2 print:border-[hsl(var(--success))]">
-        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-4 h-4 text-white print:text-[hsl(var(--success))]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
@@ -49,6 +51,8 @@ const StatusCircle = ({
   </button>
 );
 
+type PrintMode = "none" | "quotation" | "technical";
+
 const MaintenanceDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { records, updateRecord, getCustomerById } = useWorkshop();
@@ -60,6 +64,8 @@ const MaintenanceDetail = () => {
   const [laborFee, setLaborFee] = useState(record?.laborFee?.toString() || "0");
   const [editMaintenanceId, setEditMaintenanceId] = useState(record?.maintenanceId || "");
   const [editReceivedDate, setEditReceivedDate] = useState(record?.receivedDate || "");
+  const [failureAnalysis, setFailureAnalysis] = useState(record?.failureAnalysis || "");
+  const [printMode, setPrintMode] = useState<PrintMode>("none");
 
   const beforePhotoRef = useRef<HTMLInputElement>(null);
   const afterPhotoRef = useRef<HTMLInputElement>(null);
@@ -74,6 +80,8 @@ const MaintenanceDetail = () => {
   const customer = getCustomerById(record.customerId);
   const partsTotal = record.spareParts.reduce((s, p) => s + p.price, 0);
   const total = partsTotal + record.laborFee;
+
+  const hasPhotos = !!(record.beforePhoto || record.afterPhoto || (record.additionalPhotos?.length ?? 0) > 0);
 
   const addPart = () => {
     if (!newPartName || !newPartPrice) return;
@@ -147,87 +155,118 @@ const MaintenanceDetail = () => {
     }
   };
 
+  const saveFailureAnalysis = () => {
+    updateRecord(record.id, { failureAnalysis });
+    toast.success("تم حفظ أسباب العطل");
+  };
+
+  const handlePrint = (mode: PrintMode) => {
+    setPrintMode(mode);
+    setTimeout(() => {
+      window.print();
+      // Reset after print dialog closes
+      setTimeout(() => setPrintMode("none"), 500);
+    }, 100);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-8 print:max-w-none print:p-0">
-      {/* Header */}
+    <div
+      className={`max-w-4xl mx-auto space-y-6 pb-8 print:max-w-none print:p-0 print:space-y-3 ${
+        printMode === "quotation" ? "print-quotation" : printMode === "technical" ? "print-technical" : ""
+      }`}
+    >
+      {/* Professional Print Header */}
+      <PrintHeader />
+
+      {/* Print Report Title */}
+      <div className="hidden print:block text-center mb-2">
+        <h2 className="text-lg font-extrabold text-foreground">
+          {printMode === "quotation" ? "عرض سعر" : "تقرير فني"}
+        </h2>
+      </div>
+
+      {/* Screen Header */}
       <div className="flex items-center justify-between print:hidden">
         <h2 className="text-2xl font-bold text-foreground">تفاصيل الصيانة</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-lg shadow-sm"
-          onClick={() => window.print()}
-        >
-          <Printer className="w-4 h-4 ml-2" />
-          طباعة
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg shadow-sm"
+            onClick={() => handlePrint("quotation")}
+          >
+            <FileBarChart className="w-4 h-4 ml-2" />
+            طباعة عرض سعر
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg shadow-sm"
+            onClick={() => handlePrint("technical")}
+          >
+            <FileText className="w-4 h-4 ml-2" />
+            طباعة تقرير فني
+          </Button>
+        </div>
       </div>
 
-      {/* Print Header */}
-      <div className="hidden print:block text-center border-b-2 border-foreground pb-4 mb-6">
-        <h1 className="text-2xl font-extrabold">ورشة الهرم المثالي</h1>
-        <p className="text-sm text-muted-foreground">تقرير صيانة</p>
-      </div>
-
-      {/* Customer & Device Info — editable fields */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:border print:rounded-none">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Maintenance ID — editable */}
+      {/* Customer & Device Info */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:border print:rounded-none print:p-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 print:gap-2 print:grid-cols-4">
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1 block">رقم الصيانة</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[9pt]">رقم الصيانة</Label>
             <Input
               value={editMaintenanceId}
               onChange={(e) => setEditMaintenanceId(e.target.value)}
               onBlur={saveMaintenanceId}
-              className="font-bold text-lg font-mono rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent"
+              className="font-bold text-lg font-mono rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent print:text-[10pt]"
             />
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">العميل</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[9pt]">العميل</p>
             <p
-              className="font-semibold text-primary cursor-pointer hover:underline print:cursor-default print:no-underline"
+              className="font-semibold text-primary cursor-pointer hover:underline print:cursor-default print:no-underline print:text-[10pt] print:text-foreground"
               onClick={() => navigate(`/customers/${record.customerId}`)}
             >
               {customer?.name}
             </p>
-            <p className="text-xs text-muted-foreground">{customer?.phone}</p>
+            <p className="text-xs text-muted-foreground print:text-[9pt]">{customer?.phone}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">الجهاز</p>
-            <p className="font-semibold text-foreground">{record.itemName}</p>
-            <p className="text-xs text-muted-foreground font-mono">{record.itemId}</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[9pt]">الجهاز</p>
+            <p className="font-semibold text-foreground print:text-[10pt]">{record.itemName}</p>
+            <p className="text-xs text-muted-foreground font-mono print:text-[9pt]">{record.itemId}</p>
           </div>
-          {/* Received Date — editable */}
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1 block">تاريخ الاستلام</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[9pt]">تاريخ الاستلام</Label>
             <Input
               type="date"
               value={editReceivedDate}
               onChange={(e) => setEditReceivedDate(e.target.value)}
               onBlur={saveReceivedDate}
-              className="rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent"
+              className="rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent print:text-[10pt]"
             />
             {record.deliveryDate && (
               <>
-                <p className="text-xs font-medium text-muted-foreground mt-2 mb-1">تاريخ التسليم</p>
-                <p className="font-semibold text-foreground">{record.deliveryDate}</p>
+                <p className="text-xs font-medium text-muted-foreground mt-2 mb-1 print:text-[9pt]">تاريخ التسليم</p>
+                <p className="font-semibold text-foreground print:text-[10pt]">{record.deliveryDate}</p>
               </>
             )}
           </div>
         </div>
       </section>
 
-      {/* Status Overview — clickable circles */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none">
-        <h3 className="font-bold text-foreground">حالة الطلب</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      {/* Status Overview */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none print:p-3 print:space-y-2">
+        <h3 className="font-bold text-foreground print:text-[11pt]">حالة الطلب</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 print:grid-cols-3 print:gap-2">
           {/* Maintenance */}
-          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border">
-            <div className="flex items-center gap-3">
-              <Wrench className="w-5 h-5 text-muted-foreground" />
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
+            <div className="flex items-center gap-3 print:gap-1">
+              <Wrench className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
               <div>
-                <span className="text-sm font-semibold text-foreground block">الصيانة</span>
-                <span className={`text-xs font-semibold ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الصيانة</span>
+                <span className={`text-xs font-semibold print:text-[9pt] ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
                   {record.isCompleted ? "مكتملة" : "قيد الانتظار"}
                 </span>
               </div>
@@ -244,13 +283,13 @@ const MaintenanceDetail = () => {
           </div>
 
           {/* Payment */}
-          <div className="bg-muted/40 rounded-lg p-4 space-y-3 print:bg-transparent print:border print:border-border">
+          <div className="bg-muted/40 rounded-lg p-4 space-y-3 print:bg-transparent print:border print:border-border print:p-2 print:space-y-1">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign className="w-5 h-5 text-muted-foreground" />
+              <div className="flex items-center gap-3 print:gap-1">
+                <DollarSign className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
                 <div>
-                  <span className="text-sm font-semibold text-foreground block">الدفع</span>
-                  <span className={`text-xs font-semibold ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                  <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الدفع</span>
+                  <span className={`text-xs font-semibold print:text-[9pt] ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
                     {record.isPaid ? "مدفوع" : "غير مدفوع"}
                   </span>
                 </div>
@@ -278,16 +317,16 @@ const MaintenanceDetail = () => {
           </div>
 
           {/* Warranty */}
-          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border">
-            <div className="flex items-center gap-3">
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
+            <div className="flex items-center gap-3 print:gap-1">
               {record.isUnderWarranty ? (
-                <ShieldCheck className="w-5 h-5 text-[hsl(var(--success))]" />
+                <ShieldCheck className="w-5 h-5 text-[hsl(var(--success))] print:w-4 print:h-4" />
               ) : (
-                <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))]" />
+                <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))] print:w-4 print:h-4" />
               )}
               <div>
-                <span className="text-sm font-semibold text-foreground block">الضمان</span>
-                <span className={`text-xs font-semibold ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الضمان</span>
+                <span className={`text-xs font-semibold print:text-[9pt] ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
                   {record.isUnderWarranty ? "تحت الضمان" : "بدون ضمان"}
                 </span>
               </div>
@@ -300,13 +339,25 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
+      {/* Failure Analysis - Technical Report section */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide">
+        <h3 className="font-bold text-foreground print:text-[11pt]">أسباب العطل</h3>
+        <Textarea
+          value={failureAnalysis}
+          onChange={(e) => setFailureAnalysis(e.target.value)}
+          onBlur={saveFailureAnalysis}
+          placeholder="اكتب وصف العطل وأسبابه هنا..."
+          className="min-h-[100px] rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent print:text-[10pt] print:min-h-0"
+        />
+      </section>
+
       {/* Photo Documentation */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:border print:rounded-none">
-        <h3 className="font-bold text-foreground">توثيق بالصور</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <section className={`bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide ${!hasPhotos ? 'print-no-photos-hide' : ''}`}>
+        <h3 className="font-bold text-foreground print:text-[11pt]">توثيق بالصور</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:gap-3">
           {/* Before Photo */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground">صورة قبل الصيانة</Label>
+            <Label className="text-sm font-semibold text-foreground print:text-[10pt]">صورة قبل الصيانة</Label>
             <input
               ref={beforePhotoRef}
               type="file"
@@ -316,7 +367,7 @@ const MaintenanceDetail = () => {
             />
             {record.beforePhoto ? (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.beforePhoto} alt="قبل الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-48" />
+                <img src={record.beforePhoto} alt="قبل الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-40" />
                 <button
                   onClick={() => beforePhotoRef.current?.click()}
                   className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
@@ -338,7 +389,7 @@ const MaintenanceDetail = () => {
 
           {/* After Photo */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground">صورة بعد الصيانة</Label>
+            <Label className="text-sm font-semibold text-foreground print:text-[10pt]">صورة بعد الصيانة</Label>
             <input
               ref={afterPhotoRef}
               type="file"
@@ -348,7 +399,7 @@ const MaintenanceDetail = () => {
             />
             {record.afterPhoto ? (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.afterPhoto} alt="بعد الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-48" />
+                <img src={record.afterPhoto} alt="بعد الصيانة" className="w-full h-52 object-cover print:h-auto print:max-h-40" />
                 <button
                   onClick={() => afterPhotoRef.current?.click()}
                   className="print:hidden absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-card text-sm font-medium"
@@ -371,10 +422,10 @@ const MaintenanceDetail = () => {
 
         {/* Additional Photos */}
         {(record.additionalPhotos?.length ?? 0) > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4 print:grid-cols-4 print:gap-2">
             {record.additionalPhotos!.map((photo, i) => (
               <div key={i} className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={photo} alt={`صورة إضافية ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-32" />
+                <img src={photo} alt={`صورة إضافية ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
                 <button
                   onClick={() => removeAdditionalPhoto(i)}
                   className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -405,39 +456,52 @@ const MaintenanceDetail = () => {
         </Button>
       </section>
 
-      {/* Spare Parts */}
+      {/* Spare Parts & Cost Table */}
       <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden print:shadow-none print:rounded-none">
-        <div className="p-5 border-b border-border">
-          <h3 className="font-bold text-foreground">قطع الغيار</h3>
+        <div className="p-5 border-b border-border print:p-3">
+          <h3 className="font-bold text-foreground print:text-[11pt]">قطع الغيار والتكلفة</h3>
         </div>
-        <div className="p-5">
-          {record.spareParts.length > 0 && (
-            <table className="w-full mb-5">
-              <thead>
-                <tr className="text-xs font-semibold text-muted-foreground border-b border-border">
-                  <th className="text-right pb-3">القطعة</th>
-                  <th className="text-right pb-3">السعر</th>
-                  <th className="pb-3 w-10 print:hidden"></th>
+        <div className="p-5 print:p-3">
+          <table className="w-full mb-5 print:mb-2">
+            <thead>
+              <tr className="text-xs font-semibold text-muted-foreground border-b border-border print:text-[9pt]">
+                <th className="text-right pb-3 print:pb-1">البند</th>
+                <th className="text-right pb-3 print:pb-1">السعر</th>
+                <th className="pb-3 w-10 print:hidden"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {record.spareParts.map((p) => (
+                <tr key={p.id} className="border-b border-border last:border-0">
+                  <td className="py-3 text-sm text-foreground print:py-1 print:text-[10pt]">{p.name}</td>
+                  <td className="py-3 text-sm font-mono text-foreground print:py-1 print:text-[10pt]">{p.price} ر.س</td>
+                  <td className="py-3 print:hidden">
+                    <button
+                      onClick={() => removePart(p.id)}
+                      className="text-destructive hover:text-destructive/70 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {record.spareParts.map((p) => (
-                  <tr key={p.id} className="border-b border-border last:border-0">
-                    <td className="py-3 text-sm text-foreground">{p.name}</td>
-                    <td className="py-3 text-sm font-mono text-foreground">{p.price} ر.س</td>
-                    <td className="py-3 print:hidden">
-                      <button
-                        onClick={() => removePart(p.id)}
-                        className="text-destructive hover:text-destructive/70 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+              ))}
+              {/* Labor fee row */}
+              <tr className="border-b border-border">
+                <td className="py-3 text-sm text-foreground print:py-1 print:text-[10pt]">أجرة الصيانة</td>
+                <td className="py-3 text-sm font-mono text-foreground print:py-1 print:text-[10pt]">{record.laborFee} ر.س</td>
+                <td className="print:hidden"></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-foreground">
+                <td className="py-3 text-base font-bold text-foreground print:py-2 print:text-[11pt]">الإجمالي</td>
+                <td className="py-3 text-base font-bold font-mono text-primary print:py-2 print:text-[11pt]">{total} ر.س</td>
+                <td className="print:hidden"></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          {/* Add parts form - screen only */}
           <div className="flex gap-2 print:hidden">
             <Input
               placeholder="اسم القطعة"
@@ -459,10 +523,10 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
-      {/* Cost Summary */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:rounded-none">
-        <h3 className="font-bold text-foreground">ملخص التكلفة</h3>
-        <div className="flex items-center gap-3 print:hidden">
+      {/* Labor Fee Edit - screen only */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:hidden">
+        <h3 className="font-bold text-foreground">تعديل أجرة الصيانة</h3>
+        <div className="flex items-center gap-3">
           <Label className="text-sm font-semibold">أجرة الصيانة:</Label>
           <Input
             type="number"
@@ -473,27 +537,13 @@ const MaintenanceDetail = () => {
           />
           <span className="text-sm text-muted-foreground">ر.س</span>
         </div>
-        <div className="border-t border-border pt-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">إجمالي القطع</span>
-            <span className="font-mono text-foreground">{partsTotal} ر.س</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">أجرة الصيانة</span>
-            <span className="font-mono text-foreground">{record.laborFee} ر.س</span>
-          </div>
-          <div className="flex justify-between text-lg font-bold border-t border-border pt-3">
-            <span className="text-foreground">الإجمالي</span>
-            <span className="text-primary font-mono">{total} ر.س</span>
-          </div>
-        </div>
       </section>
 
       {/* Notes */}
       {record.notes && (
-        <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:rounded-none">
-          <h3 className="font-bold text-foreground mb-2">ملاحظات</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{record.notes}</p>
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:rounded-none print:p-3">
+          <h3 className="font-bold text-foreground mb-2 print:text-[11pt]">ملاحظات</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed print:text-[10pt]">{record.notes}</p>
         </section>
       )}
     </div>
