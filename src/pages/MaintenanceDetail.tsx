@@ -67,8 +67,6 @@ const MaintenanceDetail = () => {
   const [failureAnalysis, setFailureAnalysis] = useState(record?.failureAnalysis || "");
   const [printMode, setPrintMode] = useState<PrintMode>("none");
 
-  const beforePhotoRef = useRef<HTMLInputElement>(null);
-  const afterPhotoRef = useRef<HTMLInputElement>(null);
   const additionalPhotoRef = useRef<HTMLInputElement>(null);
 
   if (!record) {
@@ -82,6 +80,11 @@ const MaintenanceDetail = () => {
   const total = partsTotal + record.laborFee;
 
   const hasPhotos = !!(record.beforePhoto || record.afterPhoto || (record.additionalPhotos?.length ?? 0) > 0);
+
+  const allPhotos: { src: string; removeAction: () => void }[] = [];
+  if (record.beforePhoto) allPhotos.push({ src: record.beforePhoto, removeAction: () => updateRecord(record.id, { beforePhoto: undefined }) });
+  if (record.afterPhoto) allPhotos.push({ src: record.afterPhoto, removeAction: () => updateRecord(record.id, { afterPhoto: undefined }) });
+  (record.additionalPhotos || []).forEach((p, i) => allPhotos.push({ src: p, removeAction: () => removeAdditionalPhoto(i) }));
 
   const addPart = () => {
     if (!newPartName || !newPartPrice) return;
@@ -107,21 +110,7 @@ const MaintenanceDetail = () => {
     toast.success("تم تحديث أجرة الصيانة");
   };
 
-  const handlePhotoUpload = (
-    type: "beforePhoto" | "afterPhoto",
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      updateRecord(record.id, { [type]: reader.result as string });
-      toast.success(type === "beforePhoto" ? "تم رفع صورة قبل الصيانة" : "تم رفع صورة بعد الصيانة");
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleAdditionalPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     Array.from(files).forEach((file) => {
@@ -132,8 +121,9 @@ const MaintenanceDetail = () => {
       };
       reader.readAsDataURL(file);
     });
-    toast.success("تم رفع الصور الإضافية");
+    toast.success("تم رفع الصور");
   };
+
 
   const removeAdditionalPhoto = (index: number) => {
     const updated = [...(record.additionalPhotos || [])];
