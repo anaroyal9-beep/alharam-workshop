@@ -14,6 +14,7 @@ import Records from "@/pages/Records";
 import Customers from "@/pages/Customers";
 import CustomerDetail from "@/pages/CustomerDetail";
 import SearchPage from "@/pages/SearchPage";
+import DailyLedger from "@/pages/DailyLedger";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
