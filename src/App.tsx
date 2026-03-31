@@ -14,6 +14,7 @@ import Records from "@/pages/Records";
 import Customers from "@/pages/Customers";
 import CustomerDetail from "@/pages/CustomerDetail";
 import SearchPage from "@/pages/SearchPage";
+import DailyLedger from "@/pages/DailyLedger";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/customers/:id" element={<CustomerDetail />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/daily-ledger" element={<DailyLedger />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

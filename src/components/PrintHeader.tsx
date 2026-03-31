@@ -11,4 +11,10 @@ const PrintHeader = () => (
   </div>
 );
 
+export const PrintPolicyFooter = () => (
+  <div className="hidden print:block mt-6 pt-3 border-t border-foreground/30 text-center text-[9pt] text-muted-foreground font-semibold">
+    حد أقصى 30 يوم للاستلام
+  </div>
+);
+
 export default PrintHeader;

@@ -17,7 +17,7 @@ import {
   FileText,
   FileBarChart,
 } from "lucide-react";
-import PrintHeader from "@/components/PrintHeader";
+import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
@@ -477,6 +477,8 @@ const MaintenanceDetail = () => {
           <p className="text-sm text-muted-foreground leading-relaxed print:text-[10pt]">{record.notes}</p>
         </section>
       )}
+
+      <PrintPolicyFooter />
     </div>
   );
 };
