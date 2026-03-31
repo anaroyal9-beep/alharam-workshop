@@ -8,6 +8,7 @@ const links = [
 { to: "/maintenance/new", label: "طلب صيانة جديد", icon: Plus },
 { to: "/records", label: "سجلات الصيانة", icon: Wrench },
 { to: "/customers", label: "العملاء", icon: Users },
+{ to: "/daily-ledger", label: "اليومية", icon: BookOpen },
 { to: "/search", label: "البحث المتقدم", icon: Search }];
 
 
