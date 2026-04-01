@@ -53,7 +53,7 @@ type PrintMode = "none" | "quotation" | "technical";
 
 const MaintenanceDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { records, updateRecord, getCustomerById } = useWorkshop();
+  const { records, updateRecord, getCustomerById, technicians } = useWorkshop();
   const navigate = useNavigate();
   const record = records.find((r) => r.id === id);
 
@@ -63,6 +63,7 @@ const MaintenanceDetail = () => {
   const [editMaintenanceId, setEditMaintenanceId] = useState(record?.maintenanceId || "");
   const [editReceivedDate, setEditReceivedDate] = useState(record?.receivedDate || "");
   const [failureAnalysis, setFailureAnalysis] = useState(record?.failureAnalysis || "");
+  const [technicianName, setTechnicianName] = useState(record?.technicianName || "");
   const [printMode, setPrintMode] = useState<PrintMode>("none");
 
   const additionalPhotoRef = useRef<HTMLInputElement>(null);
