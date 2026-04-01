@@ -13,6 +13,11 @@ export interface SparePart {
   price: number;
 }
 
+export interface Technician {
+  id: string;
+  name: string;
+}
+
 export interface MaintenanceRecord {
   id: string;
   maintenanceId: string;
@@ -31,6 +36,7 @@ export interface MaintenanceRecord {
   laborFee: number;
   notes?: string;
   failureAnalysis?: string;
+  technicianName?: string;
 }
 
 interface WorkshopContextType {
