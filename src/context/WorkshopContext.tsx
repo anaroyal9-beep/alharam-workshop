@@ -42,6 +42,7 @@ export interface MaintenanceRecord {
 interface WorkshopContextType {
   customers: Customer[];
   records: MaintenanceRecord[];
+  technicians: Technician[];
   addCustomer: (c: Omit<Customer, "id">) => Customer;
   addRecord: (r: Omit<MaintenanceRecord, "id">) => MaintenanceRecord;
   updateRecord: (id: string, updates: Partial<MaintenanceRecord>) => void;
@@ -50,6 +51,8 @@ interface WorkshopContextType {
   searchRecords: (query: string) => MaintenanceRecord[];
   searchCustomers: (query: string) => Customer[];
   generateMaintenanceId: () => string;
+  addTechnician: (name: string) => Technician;
+  removeTechnician: (id: string) => void;
 }
 
 const WorkshopContext = createContext<WorkshopContextType | null>(null);
