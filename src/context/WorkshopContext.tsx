@@ -98,6 +98,11 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     },
   ]);
 
+  const [technicians, setTechnicians] = useState<Technician[]>([
+    { id: "t1", name: "محمد أحمد" },
+    { id: "t2", name: "سعيد العمري" },
+  ]);
+
   const [counter, setCounter] = useState(5);
 
   const generateMaintenanceId = useCallback(() => {
@@ -156,11 +161,22 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [customers]
   );
 
+  const addTechnician = useCallback((name: string) => {
+    const newTech: Technician = { id: generateId(), name };
+    setTechnicians((prev) => [...prev, newTech]);
+    return newTech;
+  }, []);
+
+  const removeTechnician = useCallback((id: string) => {
+    setTechnicians((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
   return (
     <WorkshopContext.Provider
       value={{
-        customers, records, addCustomer, addRecord, updateRecord,
+        customers, records, technicians, addCustomer, addRecord, updateRecord,
         getCustomerById, getRecordsByCustomer, searchRecords, searchCustomers, generateMaintenanceId,
+        addTechnician, removeTechnician,
       }}
     >
       {children}
