@@ -17,7 +17,7 @@ import {
   FileText,
   FileBarChart,
 } from "lucide-react";
-import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
+import PrintHeader, { PrintSubHeader, PrintPolicyFooter } from "@/components/PrintHeader";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
@@ -166,6 +166,7 @@ const MaintenanceDetail = () => {
     >
       {/* Professional Print Header */}
       <PrintHeader />
+      <PrintSubHeader />
 
       {/* Print Report Title */}
       <div className="hidden print:block text-center mb-2">

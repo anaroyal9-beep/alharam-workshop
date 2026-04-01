@@ -23,14 +23,15 @@ const AppSidebar = () => {
         <div className="flex items-center gap-[16px]">
           <img
             alt="شعار ورشة الهرم المثالي"
-            className="w-14 h-14 p-1 shrink-0 bg-transparent object-cover py-px px-[4px] rounded-none text-3xl" src="/lovable-uploads/f431f402-3732-47af-a54a-4e8e1e420f90.png" />
-          
+            src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png"
+            className="w-16 h-16 shrink-0 object-contain"
+          />
           <div className="min-w-0">
-            <h1 className="text-white leading-snug font-sans text-sm font-bold text-left">
-              ​AL HARAM WORKSHOP   
+            <h1 className="text-white leading-snug text-base font-extrabold tracking-wide">
+              AL HARAM PERFECT WORKSHOP
             </h1>
-            <p className="text-white/70 mt-0.5 leading-tight font-serif text-sm font-normal">
-              ​ورشة الهرم المثالى للصيانة   
+            <p className="text-white/80 mt-0.5 leading-tight text-sm font-bold">
+              ورشة الهرم المثالي للآلات والمعدات
             </p>
           </div>
         </div>
