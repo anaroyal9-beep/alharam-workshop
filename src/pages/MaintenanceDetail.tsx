@@ -245,17 +245,39 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
+      {/* Technician Field */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3">
+        <h3 className="font-bold text-foreground print:text-[11pt]">اسم الفني</h3>
+        <select
+          value={technicianName}
+          onChange={(e) => {
+            setTechnicianName(e.target.value);
+            updateRecord(record.id, { technicianName: e.target.value });
+            toast.success("تم تحديث اسم الفني");
+          }}
+          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm print:border-0 print:p-0 print:bg-transparent print:text-[10pt]"
+        >
+          <option value="">اختر الفني</option>
+          {technicians.map((t) => (
+            <option key={t.id} value={t.name}>{t.name}</option>
+          ))}
+        </select>
+        {technicianName && (
+          <p className="hidden print:block text-sm font-semibold print:text-[10pt]">{technicianName}</p>
+        )}
+      </section>
+
       {/* Status Overview */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none print:p-3 print:space-y-2">
         <h3 className="font-bold text-foreground print:text-[11pt]">حالة الطلب</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 print:grid-cols-3 print:gap-2">
-          {/* Maintenance */}
-          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
-            <div className="flex items-center gap-3 print:gap-1">
-              <Wrench className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
+          {/* Maintenance - hidden in print */}
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:hidden">
+            <div className="flex items-center gap-3">
+              <Wrench className="w-5 h-5 text-muted-foreground" />
               <div>
-                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الصيانة</span>
-                <span className={`text-xs font-semibold print:text-[9pt] ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                <span className="text-sm font-semibold text-foreground block">الصيانة</span>
+                <span className={`text-xs font-semibold ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
                   {record.isCompleted ? "مكتملة" : "قيد الانتظار"}
                 </span>
               </div>
@@ -271,13 +293,13 @@ const MaintenanceDetail = () => {
             />
           </div>
 
-          {/* Payment */}
-          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
-            <div className="flex items-center gap-3 print:gap-1">
-              <DollarSign className="w-5 h-5 text-muted-foreground print:w-4 print:h-4" />
+          {/* Payment - hidden in print */}
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:hidden">
+            <div className="flex items-center gap-3">
+              <DollarSign className="w-5 h-5 text-muted-foreground" />
               <div>
-                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الدفع</span>
-                <span className={`text-xs font-semibold print:text-[9pt] ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                <span className="text-sm font-semibold text-foreground block">الدفع</span>
+                <span className={`text-xs font-semibold ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
                   {record.isPaid ? "مدفوع" : "غير مدفوع"}
                 </span>
               </div>
@@ -291,18 +313,18 @@ const MaintenanceDetail = () => {
             />
           </div>
 
-          {/* Warranty */}
-          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:bg-transparent print:border print:border-border print:p-2">
-            <div className="flex items-center gap-3 print:gap-1">
+          {/* Warranty - visible on screen */}
+          <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:hidden">
+            <div className="flex items-center gap-3">
               {record.isUnderWarranty ? (
-                <ShieldCheck className="w-5 h-5 text-[hsl(var(--success))] print:w-4 print:h-4" />
+                <ShieldCheck className="w-5 h-5 text-[hsl(var(--success))]" />
               ) : (
-                <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))] print:w-4 print:h-4" />
+                <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))]" />
               )}
               <div>
-                <span className="text-sm font-semibold text-foreground block print:text-[10pt]">الضمان</span>
-                <span className={`text-xs font-semibold print:text-[9pt] ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
-                  {record.isUnderWarranty ? "تحت الضمان" : "بدون ضمان"}
+                <span className="text-sm font-semibold text-foreground block">الضمان</span>
+                <span className={`text-xs font-semibold ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
+                  {record.isUnderWarranty ? "ضمان صيانة" : "بدون ضمان صيانة"}
                 </span>
               </div>
             </div>
@@ -311,6 +333,13 @@ const MaintenanceDetail = () => {
               onClick={() => updateRecord(record.id, { isUnderWarranty: !record.isUnderWarranty })}
             />
           </div>
+        </div>
+
+        {/* Print-only warranty line */}
+        <div className="hidden print:block text-center py-2 border border-border rounded print:text-[10pt] font-bold">
+          {record.isUnderWarranty
+            ? "داخل مدة ضمان الصيانة"
+            : "خارج مدة ضمان الصيانة"}
         </div>
       </section>
 
