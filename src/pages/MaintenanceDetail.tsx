@@ -166,6 +166,7 @@ const MaintenanceDetail = () => {
     >
       {/* Professional Print Header */}
       <PrintHeader />
+      <PrintSubHeader />
 
       {/* Print Report Title */}
       <div className="hidden print:block text-center mb-2">
