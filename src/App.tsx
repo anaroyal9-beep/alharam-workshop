@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WorkshopProvider } from "@/context/WorkshopContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "@/pages/Login";
@@ -15,6 +16,7 @@ import Customers from "@/pages/Customers";
 import CustomerDetail from "@/pages/CustomerDetail";
 import SearchPage from "@/pages/SearchPage";
 import DailyLedger from "@/pages/DailyLedger";
+import Technicians from "@/pages/Technicians";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,26 +26,29 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <WorkshopProvider>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedRoute />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/maintenance/new" element={<NewMaintenance />} />
-                <Route path="/maintenance/:id" element={<MaintenanceDetail />} />
-                <Route path="/records" element={<Records />} />
-                <Route path="/customers" element={<Customers />} />
-                <Route path="/customers/:id" element={<CustomerDetail />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/daily-ledger" element={<DailyLedger />} />
+      <LanguageProvider>
+        <WorkshopProvider>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/maintenance/new" element={<NewMaintenance />} />
+                  <Route path="/maintenance/:id" element={<MaintenanceDetail />} />
+                  <Route path="/records" element={<Records />} />
+                  <Route path="/customers" element={<Customers />} />
+                  <Route path="/customers/:id" element={<CustomerDetail />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/daily-ledger" element={<DailyLedger />} />
+                  <Route path="/technicians" element={<Technicians />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </WorkshopProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </WorkshopProvider>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

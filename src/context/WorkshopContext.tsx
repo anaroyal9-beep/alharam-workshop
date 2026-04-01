@@ -13,6 +13,11 @@ export interface SparePart {
   price: number;
 }
 
+export interface Technician {
+  id: string;
+  name: string;
+}
+
 export interface MaintenanceRecord {
   id: string;
   maintenanceId: string;
@@ -31,11 +36,13 @@ export interface MaintenanceRecord {
   laborFee: number;
   notes?: string;
   failureAnalysis?: string;
+  technicianName?: string;
 }
 
 interface WorkshopContextType {
   customers: Customer[];
   records: MaintenanceRecord[];
+  technicians: Technician[];
   addCustomer: (c: Omit<Customer, "id">) => Customer;
   addRecord: (r: Omit<MaintenanceRecord, "id">) => MaintenanceRecord;
   updateRecord: (id: string, updates: Partial<MaintenanceRecord>) => void;
@@ -44,6 +51,8 @@ interface WorkshopContextType {
   searchRecords: (query: string) => MaintenanceRecord[];
   searchCustomers: (query: string) => Customer[];
   generateMaintenanceId: () => string;
+  addTechnician: (name: string) => Technician;
+  removeTechnician: (id: string) => void;
 }
 
 const WorkshopContext = createContext<WorkshopContextType | null>(null);
@@ -87,6 +96,11 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       spareParts: [{ id: "sp4", name: "خرطوم", price: 120 }],
       laborFee: 80
     },
+  ]);
+
+  const [technicians, setTechnicians] = useState<Technician[]>([
+    { id: "t1", name: "محمد أحمد" },
+    { id: "t2", name: "سعيد العمري" },
   ]);
 
   const [counter, setCounter] = useState(5);
@@ -147,11 +161,22 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [customers]
   );
 
+  const addTechnician = useCallback((name: string) => {
+    const newTech: Technician = { id: generateId(), name };
+    setTechnicians((prev) => [...prev, newTech]);
+    return newTech;
+  }, []);
+
+  const removeTechnician = useCallback((id: string) => {
+    setTechnicians((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
   return (
     <WorkshopContext.Provider
       value={{
-        customers, records, addCustomer, addRecord, updateRecord,
+        customers, records, technicians, addCustomer, addRecord, updateRecord,
         getCustomerById, getRecordsByCustomer, searchRecords, searchCustomers, generateMaintenanceId,
+        addTechnician, removeTechnician,
       }}
     >
       {children}

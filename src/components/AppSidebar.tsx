@@ -1,28 +1,29 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Wrench, Users, Search, Plus, BookOpen } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Search, Plus, BookOpen, UserCog } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.jpg";
-
-const links = [
-{ to: "/", label: "لوحة التحكم", icon: LayoutDashboard },
-{ to: "/maintenance/new", label: "طلب صيانة جديد", icon: Plus },
-{ to: "/records", label: "سجلات الصيانة", icon: Wrench },
-{ to: "/customers", label: "العملاء", icon: Users },
-{ to: "/daily-ledger", label: "اليومية", icon: BookOpen },
-{ to: "/search", label: "البحث المتقدم", icon: Search }];
-
+import { useLanguage } from "@/context/LanguageContext";
 
 const AppSidebar = () => {
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const links = [
+    { to: "/", label: t("dashboard"), icon: LayoutDashboard },
+    { to: "/maintenance/new", label: t("newMaintenance"), icon: Plus },
+    { to: "/records", label: t("maintenanceRecords"), icon: Wrench },
+    { to: "/customers", label: t("customers"), icon: Users },
+    { to: "/daily-ledger", label: t("dailyLedger"), icon: BookOpen },
+    { to: "/technicians", label: t("technicians"), icon: UserCog },
+    { to: "/search", label: t("search"), icon: Search },
+  ];
 
   return (
     <aside className="w-72 min-h-screen bg-sidebar flex flex-col shrink-0">
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-[16px]">
           <img
-
             alt="شعار ورشة الهرم المثالي"
-            className="w-14 h-14 p-1 shrink-0 bg-transparent object-cover py-px px-[4px] rounded-none text-3xl" src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png" />
+            className="w-14 h-14 p-1 shrink-0 bg-transparent object-cover py-px px-[4px] rounded-none text-3xl" src="/lovable-uploads/f431f402-3732-47af-a54a-4e8e1e420f90.png" />
           
           <div className="min-w-0">
             <h1 className="text-white leading-snug font-sans text-sm font-bold text-left">
