@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
@@ -62,7 +62,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-cairo font-bold;
+    @apply bg-background text-foreground font-bold;
+    font-family: 'Tajawal', 'Inter', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -81,7 +82,9 @@
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 10pt;
+    font-size: 9pt;
+    line-height: 1.5;
+    font-family: 'Tajawal', 'Inter', sans-serif;
   }
 
   /* Hide all web chrome */
@@ -124,6 +127,14 @@
     box-shadow: none !important;
     padding: 0 !important;
     background: transparent !important;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  table th, table td {
+    padding: 4px 6px;
   }
 
   /* ── Quotation mode: hide photos & failure analysis, single page ── */

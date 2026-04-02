@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkshop, SparePart } from "@/context/WorkshopContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,7 @@ import {
   FileText,
   FileBarChart,
 } from "lucide-react";
-import PrintHeader, { PrintSubHeader, PrintPolicyFooter } from "@/components/PrintHeader";
+import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
@@ -54,6 +55,7 @@ type PrintMode = "none" | "quotation" | "technical";
 const MaintenanceDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { records, updateRecord, getCustomerById, technicians } = useWorkshop();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const record = records.find((r) => r.id === id);
 
@@ -70,20 +72,16 @@ const MaintenanceDetail = () => {
 
   if (!record) {
     return (
-      <div className="text-center py-12 text-muted-foreground">لم يتم العثور على السجل</div>
+      <div className="text-center py-12 text-muted-foreground">{t("recordNotFound")}</div>
     );
   }
 
   const customer = getCustomerById(record.customerId);
   const partsTotal = record.spareParts.reduce((s, p) => s + p.price, 0);
   const total = partsTotal + record.laborFee;
+  const currency = t("sar");
 
   const hasPhotos = !!(record.beforePhoto || record.afterPhoto || (record.additionalPhotos?.length ?? 0) > 0);
-
-  const allPhotos: { src: string; removeAction: () => void }[] = [];
-  if (record.beforePhoto) allPhotos.push({ src: record.beforePhoto, removeAction: () => updateRecord(record.id, { beforePhoto: undefined }) });
-  if (record.afterPhoto) allPhotos.push({ src: record.afterPhoto, removeAction: () => updateRecord(record.id, { afterPhoto: undefined }) });
-  (record.additionalPhotos || []).forEach((p, i) => allPhotos.push({ src: p, removeAction: () => removeAdditionalPhoto(i) }));
 
   const addPart = () => {
     if (!newPartName || !newPartPrice) return;
@@ -95,7 +93,7 @@ const MaintenanceDetail = () => {
     updateRecord(record.id, { spareParts: [...record.spareParts, part] });
     setNewPartName("");
     setNewPartPrice("");
-    toast.success("تمت إضافة القطعة");
+    toast.success(t("partAdded"));
   };
 
   const removePart = (partId: string) => {
@@ -106,7 +104,7 @@ const MaintenanceDetail = () => {
 
   const updateLaborFee = () => {
     updateRecord(record.id, { laborFee: Number(laborFee) });
-    toast.success("تم تحديث أجرة الصيانة");
+    toast.success(t("laborFeeUpdated"));
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,9 +118,8 @@ const MaintenanceDetail = () => {
       };
       reader.readAsDataURL(file);
     });
-    toast.success("تم رفع الصور");
+    toast.success(t("photosUploaded"));
   };
-
 
   const removeAdditionalPhoto = (index: number) => {
     const updated = [...(record.additionalPhotos || [])];
@@ -133,78 +130,66 @@ const MaintenanceDetail = () => {
   const saveMaintenanceId = () => {
     if (editMaintenanceId && editMaintenanceId !== record.maintenanceId) {
       updateRecord(record.id, { maintenanceId: editMaintenanceId });
-      toast.success("تم تحديث رقم الصيانة");
+      toast.success(t("maintenanceIdUpdated"));
     }
   };
 
   const saveReceivedDate = () => {
     if (editReceivedDate && editReceivedDate !== record.receivedDate) {
       updateRecord(record.id, { receivedDate: editReceivedDate });
-      toast.success("تم تحديث تاريخ الاستلام");
+      toast.success(t("dateUpdated"));
     }
   };
 
   const saveFailureAnalysis = () => {
     updateRecord(record.id, { failureAnalysis });
-    toast.success("تم حفظ أسباب العطل");
+    toast.success(t("failureSaved"));
   };
 
   const handlePrint = (mode: PrintMode) => {
     setPrintMode(mode);
     setTimeout(() => {
       window.print();
-      // Reset after print dialog closes
       setTimeout(() => setPrintMode("none"), 500);
     }, 100);
   };
 
   return (
     <div
-      className={`max-w-4xl mx-auto space-y-6 pb-8 print:max-w-none print:p-0 print:space-y-3 ${
+      className={`max-w-4xl mx-auto space-y-6 pb-8 print:max-w-none print:p-0 print:space-y-2 ${
         printMode === "quotation" ? "print-quotation" : printMode === "technical" ? "print-technical" : ""
       }`}
     >
       {/* Professional Print Header */}
       <PrintHeader />
-      <PrintSubHeader />
 
       {/* Print Report Title */}
-      <div className="hidden print:block text-center mb-2">
-        <h2 className="text-lg font-extrabold text-foreground">
-          {printMode === "quotation" ? "عرض سعر" : "تقرير فني"}
+      <div className="hidden print:block text-center mb-1">
+        <h2 className="text-[13pt] font-extrabold text-foreground border-b border-foreground/20 pb-1 inline-block px-8">
+          {printMode === "quotation" ? t("quotation") : t("technicalReport")}
         </h2>
       </div>
 
       {/* Screen Header */}
       <div className="flex items-center justify-between print:hidden">
-        <h2 className="text-2xl font-bold text-foreground">تفاصيل الصيانة</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t("maintenanceDetails")}</h2>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-lg shadow-sm"
-            onClick={() => handlePrint("quotation")}
-          >
+          <Button variant="outline" size="sm" className="rounded-lg shadow-sm" onClick={() => handlePrint("quotation")}>
             <FileBarChart className="w-4 h-4 ml-2" />
-            طباعة عرض سعر
+            {t("printQuotation")}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-lg shadow-sm"
-            onClick={() => handlePrint("technical")}
-          >
+          <Button variant="outline" size="sm" className="rounded-lg shadow-sm" onClick={() => handlePrint("technical")}>
             <FileText className="w-4 h-4 ml-2" />
-            طباعة تقرير فني
+            {t("printTechnical")}
           </Button>
         </div>
       </div>
 
       {/* Customer & Device Info */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:border print:rounded-none print:p-3">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 print:gap-2 print:grid-cols-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 print:gap-3 print:grid-cols-4">
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[9pt]">رقم الصيانة</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[8pt]">{t("maintenanceId")}</Label>
             <Input
               value={editMaintenanceId}
               onChange={(e) => setEditMaintenanceId(e.target.value)}
@@ -213,22 +198,22 @@ const MaintenanceDetail = () => {
             />
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[9pt]">العميل</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[8pt]">{t("customer")}</p>
             <p
               className="font-semibold text-primary cursor-pointer hover:underline print:cursor-default print:no-underline print:text-[10pt] print:text-foreground"
               onClick={() => navigate(`/customers/${record.customerId}`)}
             >
               {customer?.name}
             </p>
-            <p className="text-xs text-muted-foreground print:text-[9pt]">{customer?.phone}</p>
+            <p className="text-xs text-muted-foreground print:text-[8pt]">{customer?.phone}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[9pt]">الجهاز</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1 print:text-[8pt]">{t("device")}</p>
             <p className="font-semibold text-foreground print:text-[10pt]">{record.itemName}</p>
-            <p className="text-xs text-muted-foreground font-mono print:text-[9pt]">{record.itemId}</p>
+            <p className="text-xs text-muted-foreground font-mono print:text-[8pt]">{record.itemId}</p>
           </div>
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[9pt]">تاريخ الاستلام</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1 block print:text-[8pt]">{t("receivedDate")}</Label>
             <Input
               type="date"
               value={editReceivedDate}
@@ -238,7 +223,7 @@ const MaintenanceDetail = () => {
             />
             {record.deliveryDate && (
               <>
-                <p className="text-xs font-medium text-muted-foreground mt-2 mb-1 print:text-[9pt]">تاريخ التسليم</p>
+                <p className="text-xs font-medium text-muted-foreground mt-2 mb-1 print:text-[8pt]">{t("deliveryDate")}</p>
                 <p className="font-semibold text-foreground print:text-[10pt]">{record.deliveryDate}</p>
               </>
             )}
@@ -246,40 +231,37 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
-      {/* Technician Field */}
-      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3">
-        <h3 className="font-bold text-foreground print:text-[11pt]">اسم الفني</h3>
+      {/* Technician Field - screen only, moved to footer for print */}
+      <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:hidden">
+        <h3 className="font-bold text-foreground">{t("technicianName")}</h3>
         <select
           value={technicianName}
           onChange={(e) => {
             setTechnicianName(e.target.value);
             updateRecord(record.id, { technicianName: e.target.value });
-            toast.success("تم تحديث اسم الفني");
+            toast.success(t("technicianUpdated"));
           }}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm print:border-0 print:p-0 print:bg-transparent print:text-[10pt]"
+          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
         >
-          <option value="">اختر الفني</option>
-          {technicians.map((t) => (
-            <option key={t.id} value={t.name}>{t.name}</option>
+          <option value="">{t("selectTechnician")}</option>
+          {technicians.map((tech) => (
+            <option key={tech.id} value={tech.name}>{tech.name}</option>
           ))}
         </select>
-        {technicianName && (
-          <p className="hidden print:block text-sm font-semibold print:text-[10pt]">{technicianName}</p>
-        )}
       </section>
 
       {/* Status Overview */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none print:p-3 print:space-y-2">
-        <h3 className="font-bold text-foreground print:text-[11pt]">حالة الطلب</h3>
+        <h3 className="font-bold text-foreground print:text-[10pt]">{t("orderStatus")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 print:grid-cols-3 print:gap-2">
           {/* Maintenance - hidden in print */}
           <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:hidden">
             <div className="flex items-center gap-3">
               <Wrench className="w-5 h-5 text-muted-foreground" />
               <div>
-                <span className="text-sm font-semibold text-foreground block">الصيانة</span>
+                <span className="text-sm font-semibold text-foreground block">{t("maintenance")}</span>
                 <span className={`text-xs font-semibold ${record.isCompleted ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
-                  {record.isCompleted ? "مكتملة" : "قيد الانتظار"}
+                  {record.isCompleted ? t("completed") : t("pending")}
                 </span>
               </div>
             </div>
@@ -299,9 +281,9 @@ const MaintenanceDetail = () => {
             <div className="flex items-center gap-3">
               <DollarSign className="w-5 h-5 text-muted-foreground" />
               <div>
-                <span className="text-sm font-semibold text-foreground block">الدفع</span>
+                <span className="text-sm font-semibold text-foreground block">{t("payment")}</span>
                 <span className={`text-xs font-semibold ${record.isPaid ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
-                  {record.isPaid ? "مدفوع" : "غير مدفوع"}
+                  {record.isPaid ? t("paid") : t("unpaid")}
                 </span>
               </div>
             </div>
@@ -309,7 +291,7 @@ const MaintenanceDetail = () => {
               active={record.isPaid}
               onClick={() => {
                 updateRecord(record.id, { isPaid: !record.isPaid });
-                toast.success(record.isPaid ? "تم إلغاء الدفع" : "تم تسجيل الدفع");
+                toast.success(record.isPaid ? t("cancelPayment") : t("togglePayment"));
               }}
             />
           </div>
@@ -323,9 +305,9 @@ const MaintenanceDetail = () => {
                 <ShieldX className="w-5 h-5 text-[hsl(var(--destructive))]" />
               )}
               <div>
-                <span className="text-sm font-semibold text-foreground block">الضمان</span>
+                <span className="text-sm font-semibold text-foreground block">{t("warranty")}</span>
                 <span className={`text-xs font-semibold ${record.isUnderWarranty ? "text-[hsl(var(--success))]" : "text-[hsl(var(--destructive))]"}`}>
-                  {record.isUnderWarranty ? "ضمان صيانة" : "بدون ضمان صيانة"}
+                  {record.isUnderWarranty ? t("maintenanceWarranty") : t("noMaintenanceWarranty")}
                 </span>
               </div>
             </div>
@@ -337,61 +319,49 @@ const MaintenanceDetail = () => {
         </div>
 
         {/* Print-only warranty line */}
-        <div className="hidden print:block text-center py-2 border border-border rounded print:text-[10pt] font-bold">
-          {record.isUnderWarranty
-            ? "داخل مدة ضمان الصيانة"
-            : "خارج مدة ضمان الصيانة"}
+        <div className="hidden print:block text-center py-1.5 border border-border rounded print:text-[10pt] font-bold">
+          {record.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
         </div>
       </section>
 
       {/* Failure Analysis - Technical Report section */}
       <section className={`bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide ${!failureAnalysis.trim() ? 'print-no-photos-hide' : ''}`}>
-        <h3 className="font-bold text-foreground print:text-[11pt]">أسباب العطل</h3>
+        <h3 className="font-bold text-foreground print:text-[10pt]">{t("failureAnalysis")}</h3>
         <Textarea
           value={failureAnalysis}
           onChange={(e) => setFailureAnalysis(e.target.value)}
           onBlur={saveFailureAnalysis}
-          placeholder="اكتب وصف العطل وأسبابه هنا..."
-          className="min-h-[100px] rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent print:text-[10pt] print:min-h-0"
+          placeholder={t("failureDesc")}
+          className="min-h-[100px] rounded-lg print:border-0 print:p-0 print:shadow-none print:bg-transparent print:text-[9pt] print:min-h-0"
         />
       </section>
 
-      {/* Photo Documentation - Single unified section */}
+      {/* Photo Documentation */}
       <section className={`bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:shadow-none print:border print:rounded-none print:p-3 print-quotation-hide ${!hasPhotos ? 'print-no-photos-hide' : ''}`}>
-        <h3 className="font-bold text-foreground print:text-[11pt]">صور الصيانة</h3>
+        <h3 className="font-bold text-foreground print:text-[10pt]">{t("maintenancePhotos")}</h3>
 
-        {/* All photos grid */}
         {hasPhotos && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
             {record.beforePhoto && (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.beforePhoto} alt="صورة صيانة" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
-                <button
-                  onClick={() => updateRecord(record.id, { beforePhoto: undefined })}
-                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
+                <img src={record.beforePhoto} alt="photo" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+                <button onClick={() => updateRecord(record.id, { beforePhoto: undefined })} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
               </div>
             )}
             {record.afterPhoto && (
               <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.afterPhoto} alt="صورة صيانة" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
-                <button
-                  onClick={() => updateRecord(record.id, { afterPhoto: undefined })}
-                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
+                <img src={record.afterPhoto} alt="photo" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+                <button onClick={() => updateRecord(record.id, { afterPhoto: undefined })} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
               </div>
             )}
             {record.additionalPhotos?.map((photo, i) => (
               <div key={i} className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={photo} alt={`صورة ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
-                <button
-                  onClick={() => removeAdditionalPhoto(i)}
-                  className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
+                <img src={photo} alt={`photo ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+                <button onClick={() => removeAdditionalPhoto(i)} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
               </div>
@@ -399,65 +369,50 @@ const MaintenanceDetail = () => {
           </div>
         )}
 
-        <input
-          ref={additionalPhotoRef}
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={handlePhotoUpload}
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-lg print:hidden"
-          onClick={() => additionalPhotoRef.current?.click()}
-        >
+        <input ref={additionalPhotoRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhotoUpload} />
+        <Button variant="outline" size="sm" className="rounded-lg print:hidden" onClick={() => additionalPhotoRef.current?.click()}>
           <ImagePlus className="w-4 h-4 ml-2" />
-          إضافة صور
+          {t("addPhotos")}
         </Button>
       </section>
 
       {/* Spare Parts & Cost Table */}
       <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden print:shadow-none print:rounded-none">
         <div className="p-5 border-b border-border print:p-3">
-          <h3 className="font-bold text-foreground print:text-[11pt]">قطع الغيار والتكلفة</h3>
+          <h3 className="font-bold text-foreground print:text-[10pt]">{t("spareParts")}</h3>
         </div>
         <div className="p-5 print:p-3">
           <table className="w-full mb-5 print:mb-2">
             <thead>
-              <tr className="text-xs font-semibold text-muted-foreground border-b border-border print:text-[9pt]">
-                <th className="text-right pb-3 print:pb-1">البند</th>
-                <th className="text-right pb-3 print:pb-1">السعر</th>
+              <tr className="text-xs font-semibold text-muted-foreground border-b border-border print:text-[8pt]">
+                <th className="text-right pb-3 print:pb-1.5 print:pr-2">{t("item")}</th>
+                <th className="text-right pb-3 print:pb-1.5">{t("price")}</th>
                 <th className="pb-3 w-10 print:hidden"></th>
               </tr>
             </thead>
             <tbody>
               {record.spareParts.map((p) => (
-                <tr key={p.id} className="border-b border-border last:border-0">
-                  <td className="py-3 text-sm text-foreground print:py-1 print:text-[10pt]">{p.name}</td>
-                  <td className="py-3 text-sm font-mono text-foreground print:py-1 print:text-[10pt]">{p.price} ر.س</td>
+                <tr key={p.id} className="border-b border-border/50 last:border-0">
+                  <td className="py-3 text-sm text-foreground print:py-1.5 print:text-[9pt] print:pr-2">{p.name}</td>
+                  <td className="py-3 text-sm font-mono text-foreground print:py-1.5 print:text-[9pt]">{p.price} {currency}</td>
                   <td className="py-3 print:hidden">
-                    <button
-                      onClick={() => removePart(p.id)}
-                      className="text-destructive hover:text-destructive/70 transition-colors"
-                    >
+                    <button onClick={() => removePart(p.id)} className="text-destructive hover:text-destructive/70 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
               ))}
               {/* Labor fee row */}
-              <tr className="border-b border-border">
-                <td className="py-3 text-sm text-foreground print:py-1 print:text-[10pt]">أجرة الصيانة</td>
-                <td className="py-3 text-sm font-mono text-foreground print:py-1 print:text-[10pt]">{record.laborFee} ر.س</td>
+              <tr className="border-b border-border/50">
+                <td className="py-3 text-sm text-foreground print:py-1.5 print:text-[9pt] print:pr-2">{t("laborFee")}</td>
+                <td className="py-3 text-sm font-mono text-foreground print:py-1.5 print:text-[9pt]">{record.laborFee} {currency}</td>
                 <td className="print:hidden"></td>
               </tr>
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-foreground">
-                <td className="py-3 text-base font-bold text-foreground print:py-2 print:text-[11pt]">الإجمالي</td>
-                <td className="py-3 text-base font-bold font-mono text-primary print:py-2 print:text-[11pt]">{total} ر.س</td>
+                <td className="py-3 text-base font-extrabold text-foreground print:py-2 print:text-[11pt] print:bg-muted/30 print:pr-2">{t("total")}</td>
+                <td className="py-3 text-base font-extrabold font-mono text-primary print:py-2 print:text-[11pt] print:bg-muted/30">{total} {currency}</td>
                 <td className="print:hidden"></td>
               </tr>
             </tfoot>
@@ -465,51 +420,42 @@ const MaintenanceDetail = () => {
 
           {/* Add parts form - screen only */}
           <div className="flex gap-2 print:hidden">
-            <Input
-              placeholder="اسم القطعة"
-              value={newPartName}
-              onChange={(e) => setNewPartName(e.target.value)}
-              className="flex-1 rounded-lg"
-            />
-            <Input
-              placeholder="السعر"
-              type="number"
-              value={newPartPrice}
-              onChange={(e) => setNewPartPrice(e.target.value)}
-              className="w-28 rounded-lg"
-            />
-            <Button onClick={addPart} size="sm" className="rounded-lg shadow-sm">
-              إضافة
-            </Button>
+            <Input placeholder={t("newPartName")} value={newPartName} onChange={(e) => setNewPartName(e.target.value)} className="flex-1 rounded-lg" />
+            <Input placeholder={t("priceLabel")} type="number" value={newPartPrice} onChange={(e) => setNewPartPrice(e.target.value)} className="w-28 rounded-lg" />
+            <Button onClick={addPart} size="sm" className="rounded-lg shadow-sm">{t("add")}</Button>
           </div>
         </div>
       </section>
 
       {/* Labor Fee Edit - screen only */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4 print:hidden">
-        <h3 className="font-bold text-foreground">تعديل أجرة الصيانة</h3>
+        <h3 className="font-bold text-foreground">{t("editLaborFee")}</h3>
         <div className="flex items-center gap-3">
-          <Label className="text-sm font-semibold">أجرة الصيانة:</Label>
-          <Input
-            type="number"
-            value={laborFee}
-            onChange={(e) => setLaborFee(e.target.value)}
-            onBlur={updateLaborFee}
-            className="w-32 rounded-lg"
-          />
-          <span className="text-sm text-muted-foreground">ر.س</span>
+          <Label className="text-sm font-semibold">{t("laborFeeLabel")}</Label>
+          <Input type="number" value={laborFee} onChange={(e) => setLaborFee(e.target.value)} onBlur={updateLaborFee} className="w-32 rounded-lg" />
+          <span className="text-sm text-muted-foreground">{currency}</span>
         </div>
       </section>
 
       {/* Notes */}
       {record.notes && (
         <section className="bg-card rounded-xl shadow-sm border border-border p-6 print:shadow-none print:rounded-none print:p-3">
-          <h3 className="font-bold text-foreground mb-2 print:text-[11pt]">ملاحظات</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed print:text-[10pt]">{record.notes}</p>
+          <h3 className="font-bold text-foreground mb-2 print:text-[10pt]">{t("notes")}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed print:text-[9pt]">{record.notes}</p>
         </section>
       )}
 
-      <PrintPolicyFooter />
+      {/* Print Footer: Technician name + Policy */}
+      <div className="hidden print:block mt-4 pt-3 border-t border-foreground/30">
+        {technicianName && (
+          <div className="flex justify-between items-center mb-2 text-[9pt]">
+            <span className="font-bold text-foreground">{t("technicianName")}: {technicianName}</span>
+          </div>
+        )}
+        <p className="text-center text-[8pt] text-muted-foreground font-semibold">
+          {lang === "ar" ? "حد أقصى 30 يوم للاستلام" : "Maximum 30 days for collection"}
+        </p>
+      </div>
     </div>
   );
 };
