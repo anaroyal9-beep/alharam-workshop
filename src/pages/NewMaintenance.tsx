@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useWorkshop } from "@/context/WorkshopContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 
 const NewMaintenance = () => {
   const { customers, addCustomer, addRecord, generateMaintenanceId, searchCustomers } = useWorkshop();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [customerSearch, setCustomerSearch] = useState("");
@@ -29,15 +31,15 @@ const NewMaintenance = () => {
     let custId = selectedCustomerId;
     if (showNewCustomer) {
       if (!newName || !newPhone) {
-        toast.error("يرجى إدخال اسم ورقم هاتف العميل");
+        toast.error(t("enterCustomerNamePhone"));
         return;
       }
       const c = addCustomer({ name: newName, phone: newPhone, company: newCompany || undefined });
       custId = c.id;
     }
-    if (!custId) { toast.error("يرجى اختيار عميل"); return; }
-    if (!itemName) { toast.error("يرجى إدخال اسم الجهاز"); return; }
-    if (!maintenanceId.trim()) { toast.error("يرجى إدخال رقم الصيانة"); return; }
+    if (!custId) { toast.error(t("selectCustomer")); return; }
+    if (!itemName) { toast.error(t("enterDeviceName")); return; }
+    if (!maintenanceId.trim()) { toast.error(t("enterMaintenanceNumber")); return; }
 
     const record = addRecord({
       maintenanceId: maintenanceId.trim(),
@@ -52,37 +54,35 @@ const NewMaintenance = () => {
       laborFee: 0,
       notes: notes || undefined,
     });
-    toast.success(`تم إنشاء طلب الصيانة ${maintenanceId}`);
+    toast.success(`${t("maintenanceCreated")} ${maintenanceId}`);
     navigate(`/maintenance/${record.id}`);
   };
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h2 className="text-2xl font-bold">طلب صيانة جديد</h2>
+      <h2 className="text-2xl font-bold">{t("newMaintenance")}</h2>
 
       <div className="bg-card rounded-lg shadow-sm border border-border p-6 space-y-5">
-        {/* Maintenance Number & Date */}
         <div className="space-y-3">
-          <Label className="text-base font-semibold">بيانات الصيانة</Label>
+          <Label className="text-base font-semibold">{t("maintenanceData")}</Label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-sm text-muted-foreground">رقم الصيانة</Label>
-              <Input placeholder="أدخل رقم الصيانة" value={maintenanceId} onChange={(e) => setMaintenanceId(e.target.value)} />
+              <Label className="text-sm text-muted-foreground">{t("maintenanceNumber")}</Label>
+              <Input placeholder={t("enterMaintenanceId")} value={maintenanceId} onChange={(e) => setMaintenanceId(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <Label className="text-sm text-muted-foreground">التاريخ</Label>
+              <Label className="text-sm text-muted-foreground">{t("date")}</Label>
               <Input type="date" value={receivedDate} onChange={(e) => setReceivedDate(e.target.value)} />
             </div>
           </div>
         </div>
 
-        {/* Customer Selection */}
         <div className="space-y-3">
-          <Label className="text-base font-semibold">العميل</Label>
+          <Label className="text-base font-semibold">{t("customer")}</Label>
           {!showNewCustomer ? (
             <>
               <Input
-                placeholder="ابحث بالاسم أو رقم الهاتف..."
+                placeholder={t("searchByNameOrPhone")}
                 value={customerSearch}
                 onChange={(e) => { setCustomerSearch(e.target.value); setSelectedCustomerId(""); }}
               />
@@ -101,34 +101,33 @@ const NewMaintenance = () => {
                 </div>
               )}
               <Button variant="outline" size="sm" onClick={() => setShowNewCustomer(true)}>
-                + إضافة عميل جديد
+                + {t("addNewCustomer")}
               </Button>
             </>
           ) : (
             <div className="space-y-3 border border-border rounded-lg p-4">
-              <Input placeholder="اسم العميل" value={newName} onChange={(e) => setNewName(e.target.value)} />
-              <Input placeholder="رقم الهاتف" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
-              <Input placeholder="الشركة (اختياري)" value={newCompany} onChange={(e) => setNewCompany(e.target.value)} />
+              <Input placeholder={t("customerName")} value={newName} onChange={(e) => setNewName(e.target.value)} />
+              <Input placeholder={t("phoneNumber")} value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
+              <Input placeholder={t("companyOptional")} value={newCompany} onChange={(e) => setNewCompany(e.target.value)} />
               <Button variant="ghost" size="sm" onClick={() => setShowNewCustomer(false)}>
-                اختيار عميل موجود
+                {t("selectExistingCustomer")}
               </Button>
             </div>
           )}
         </div>
 
-        {/* Item Details */}
         <div className="space-y-3">
-          <Label className="text-base font-semibold">تفاصيل الجهاز</Label>
-          <Input placeholder="اسم الجهاز" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-          <Input placeholder="رقم الجهاز (اختياري)" value={itemId} onChange={(e) => setItemId(e.target.value)} />
+          <Label className="text-base font-semibold">{t("deviceDetails")}</Label>
+          <Input placeholder={t("deviceName")} value={itemName} onChange={(e) => setItemName(e.target.value)} />
+          <Input placeholder={t("deviceIdOptional")} value={itemId} onChange={(e) => setItemId(e.target.value)} />
         </div>
 
         <div className="space-y-2">
-          <Label>ملاحظات</Label>
-          <Textarea placeholder="ملاحظات إضافية..." value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <Label>{t("notes")}</Label>
+          <Textarea placeholder={t("additionalNotes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </div>
 
-        <Button onClick={handleSubmit} className="w-full">إنشاء طلب الصيانة</Button>
+        <Button onClick={handleSubmit} className="w-full">{t("createMaintenanceOrder")}</Button>
       </div>
     </div>
   );

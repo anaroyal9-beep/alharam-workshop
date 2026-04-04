@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ const Login = () => {
       sessionStorage.setItem("auth", "true");
       navigate("/", { replace: true });
     } else {
-      setError("خطأ في اسم المستخدم أو كلمة المرور");
+      setError(t("loginError"));
     }
   };
 
@@ -37,22 +39,22 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="username">اسم المستخدم</Label>
+              <Label htmlFor="username">{t("username")}</Label>
               <Input
                 id="username"
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="أدخل اسم المستخدم"
+                placeholder={t("enterUsername")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                placeholder="أدخل كلمة المرور"
+                placeholder={t("enterPassword")}
               />
             </div>
 
@@ -63,7 +65,7 @@ const Login = () => {
             )}
 
             <Button type="submit" className="w-full text-base h-12">
-              تسجيل الدخول
+              {t("login")}
             </Button>
           </form>
         </CardContent>

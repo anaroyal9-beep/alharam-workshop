@@ -1,4 +1,5 @@
 import { useWorkshop } from "@/context/WorkshopContext";
+import { useLanguage } from "@/context/LanguageContext";
 import StatCard from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, AlertCircle, CheckCircle, BanknoteIcon, ShieldCheck } from "lucide-react";
@@ -21,6 +22,7 @@ const alertStyles: Record<string, string> = {
 
 const Dashboard = () => {
   const { records, customers, getCustomerById } = useWorkshop();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const pending = records.filter((r) => !r.isCompleted);
@@ -28,30 +30,28 @@ const Dashboard = () => {
   const unpaid = records.filter((r) => !r.isPaid);
   const underWarranty = records.filter((r) => r.isUnderWarranty);
 
-  // Records with alerts (completed but not collected after 7+ days)
   const alertRecords = records
     .map((r) => ({ ...r, alert: getAlertStatus(r) }))
     .filter((r) => r.alert !== null);
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-extrabold">لوحة التحكم</h2>
+      <h2 className="text-2xl font-extrabold">{t("dashboard")}</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title="إجمالي الطلبات" value={records.length} icon={Wrench} variant="primary" />
-        <StatCard title="قيد الصيانة" value={pending.length} icon={AlertCircle} variant="secondary" />
-        <StatCard title="مكتملة" value={completed.length} icon={CheckCircle} variant="accent" />
-        <StatCard title="غير مدفوعة" value={unpaid.length} icon={BanknoteIcon} variant="destructive" />
-        <StatCard title="تحت الضمان" value={underWarranty.length} icon={ShieldCheck} variant="primary" />
+        <StatCard title={t("totalOrders")} value={records.length} icon={Wrench} variant="primary" />
+        <StatCard title={t("underMaintenance")} value={pending.length} icon={AlertCircle} variant="secondary" />
+        <StatCard title={t("completedOrders")} value={completed.length} icon={CheckCircle} variant="accent" />
+        <StatCard title={t("unpaidBills")} value={unpaid.length} icon={BanknoteIcon} variant="destructive" />
+        <StatCard title={t("underWarranty")} value={underWarranty.length} icon={ShieldCheck} variant="primary" />
       </div>
 
-      {/* Alert Section */}
       {alertRecords.length > 0 && (
         <div className="bg-card rounded-lg shadow-sm border border-border">
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-yellow-500" />
-              تنبيهات الاستلام
+              {t("collectionAlerts")}
             </h3>
           </div>
           <div className="divide-y divide-border">
@@ -68,19 +68,19 @@ const Dashboard = () => {
                   <div>
                     <p className="font-medium">{r.itemName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {customer?.name} • {r.maintenanceId} • تسليم: {r.deliveryDate}
+                      {customer?.name} • {r.maintenanceId} • {t("delivery")}: {r.deliveryDate}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{diffDays} يوم منذ التسليم</span>
+                    <span className="text-xs text-muted-foreground">{diffDays} {t("daysSinceDelivery")}</span>
                     {r.alert === "blue" && (
                       <Badge className="bg-blue-500/15 text-blue-600 border-blue-500/30 text-xs">
-                        تم انتهاء مهلة الانتظار
+                        {t("waitingExpired")}
                       </Badge>
                     )}
                     {r.alert === "yellow" && (
                       <Badge className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30 text-xs">
-                        تنبيه تأخر الاستلام
+                        {t("lateCollection")}
                       </Badge>
                     )}
                   </div>
@@ -92,14 +92,13 @@ const Dashboard = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pending */}
         <div className="bg-card rounded-lg shadow-sm border border-border">
           <div className="p-4 border-b border-border">
-            <h3 className="font-semibold">طلبات قيد الصيانة</h3>
+            <h3 className="font-semibold">{t("pendingMaintenance")}</h3>
           </div>
           <div className="divide-y divide-border">
             {pending.length === 0 ? (
-              <p className="p-4 text-muted-foreground text-sm">لا توجد طلبات قيد الصيانة</p>
+              <p className="p-4 text-muted-foreground text-sm">{t("noPendingOrders")}</p>
             ) : (
               pending.map((r) => {
                 const customer = getCustomerById(r.customerId);
@@ -114,12 +113,12 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground">{customer?.name} • {r.maintenanceId}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Badge className="bg-red-500/15 text-red-600 border-red-500/30">قيد الانتظار</Badge>
+                      <Badge className="bg-red-500/15 text-red-600 border-red-500/30">{t("pending")}</Badge>
                       <Badge className={r.isPaid
                         ? "bg-green-500/15 text-green-600 border-green-500/30"
                         : "bg-red-500/15 text-red-600 border-red-500/30"
                       }>
-                        {r.isPaid ? "مدفوع" : "غير مدفوع"}
+                        {r.isPaid ? t("paid") : t("unpaid")}
                       </Badge>
                     </div>
                   </div>
@@ -129,14 +128,13 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Unpaid */}
         <div className="bg-card rounded-lg shadow-sm border border-border">
           <div className="p-4 border-b border-border">
-            <h3 className="font-semibold">فواتير غير مدفوعة</h3>
+            <h3 className="font-semibold">{t("unpaidInvoices")}</h3>
           </div>
           <div className="divide-y divide-border">
             {unpaid.length === 0 ? (
-              <p className="p-4 text-muted-foreground text-sm">لا توجد فواتير غير مدفوعة</p>
+              <p className="p-4 text-muted-foreground text-sm">{t("noUnpaidInvoices")}</p>
             ) : (
               unpaid.map((r) => {
                 const customer = getCustomerById(r.customerId);
@@ -152,12 +150,12 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground">{customer?.name}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-destructive">{total} ر.س</span>
+                      <span className="font-bold text-destructive">{total} {t("sar")}</span>
                       <Badge className={r.isCompleted
                         ? "bg-green-500/15 text-green-600 border-green-500/30"
                         : "bg-red-500/15 text-red-600 border-red-500/30"
                       }>
-                        {r.isCompleted ? "مكتملة" : "قيد الانتظار"}
+                        {r.isCompleted ? t("completed") : t("pending")}
                       </Badge>
                     </div>
                   </div>
