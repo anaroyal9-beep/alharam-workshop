@@ -2,11 +2,12 @@ import banner from "@/assets/print-banner.png";
 
 const PrintHeader = () => {
   return (
-    <div className="hidden print:block mb-3">
+    <div className="hidden print:block -mx-[var(--print-margin,0px)] mb-2" style={{ margin: 0, padding: 0 }}>
       <img
         src={banner}
         alt="AL HARAM PERFECT WORKSHOP - ورشة الهرم المثالي"
-        className="w-full h-auto object-contain"
+        className="w-full h-auto block"
+        style={{ display: 'block', width: '100%', maxWidth: '100%' }}
       />
     </div>
   );
