@@ -92,7 +92,8 @@ const DailyLedger = () => {
   return (
     <div className="space-y-4 print:space-y-2" dir="rtl">
       {/* ── Print Header ─────────────────────────────── */}
-      <div className="hidden print:block text-center border-b-2 border-foreground pb-2 mb-2">
+      <PrintHeader />
+      <div className="hidden print:block text-center pb-2 mb-2">
         <h1 className="text-lg font-extrabold">يومية ورشة الهرم المثالي للآلات والمعدات</h1>
         <div className="flex justify-between mt-1 text-[9pt] font-bold px-4">
           <span>التاريخ: {date}</span>
