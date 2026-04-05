@@ -66,8 +66,9 @@ const Dashboard = () => {
           <div className="divide-y divide-border">
             {alertRecords.map((r) => {
               const customer = getCustomerById(r.customerId);
-              const delivery = new Date(r.deliveryDate!);
-              const diffDays = Math.floor((new Date().getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
+              const isUncompleted30 = !r.isCompleted;
+              const refDate = isUncompleted30 ? new Date(r.receivedDate) : new Date(r.deliveryDate!);
+              const diffDays = Math.floor((new Date().getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
               return (
                 <div
                   key={r.id}
