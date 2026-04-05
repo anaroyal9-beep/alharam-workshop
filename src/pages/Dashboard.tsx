@@ -78,7 +78,7 @@ const Dashboard = () => {
                   <div>
                     <p className="font-medium">{r.itemName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {customer?.name} • {r.maintenanceId} • {t("delivery")}: {r.deliveryDate}
+                      {customer?.name} • {r.maintenanceId} • {isUncompleted30 ? t("receivedDate") : t("delivery")}: {isUncompleted30 ? r.receivedDate : r.deliveryDate}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
