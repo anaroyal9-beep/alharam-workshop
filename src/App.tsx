@@ -17,6 +17,8 @@ import CustomerDetail from "@/pages/CustomerDetail";
 import SearchPage from "@/pages/SearchPage";
 import DailyLedger from "@/pages/DailyLedger";
 import Technicians from "@/pages/Technicians";
+import Statistics from "@/pages/Statistics";
+import Reports from "@/pages/Reports";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
