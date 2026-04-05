@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Wrench, Users, Search, Plus, BookOpen, UserCog } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Search, Plus, BookOpen, UserCog, BarChart3, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -14,6 +14,8 @@ const AppSidebar = () => {
     { to: "/customers", label: t("customers"), icon: Users },
     { to: "/daily-ledger", label: t("dailyLedger"), icon: BookOpen },
     { to: "/technicians", label: t("technicians"), icon: UserCog },
+    { to: "/statistics", label: t("statistics"), icon: BarChart3 },
+    { to: "/reports", label: t("reports"), icon: FileText },
     { to: "/search", label: t("search"), icon: Search },
   ];
 

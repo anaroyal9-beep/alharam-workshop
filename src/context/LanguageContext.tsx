@@ -188,6 +188,29 @@ const translations: Translations = {
   pendingTasks: { ar: "مهام معلقة", en: "Pending Tasks" },
   completionRate: { ar: "نسبة الإنجاز", en: "Completion Rate" },
 
+  // Statistics
+  statistics: { ar: "الإحصائيات", en: "Statistics" },
+  totalPaid: { ar: "إجمالي المدفوع", en: "Total Paid" },
+  remainingBalances: { ar: "المبالغ المتبقية", en: "Remaining Balances" },
+  totalCustomers: { ar: "إجمالي العملاء", en: "Total Customers" },
+  paymentDistribution: { ar: "توزيع المدفوعات", en: "Payment Distribution" },
+  warrantyDistribution: { ar: "توزيع الضمان", en: "Warranty Distribution" },
+  customerGrowth: { ar: "نمو العملاء", en: "Customer Growth" },
+  newCustomers: { ar: "عملاء جدد", en: "New Customers" },
+  returningCustomers: { ar: "عملاء عائدون", en: "Returning Customers" },
+
+  // Reports
+  reports: { ar: "التقارير", en: "Reports" },
+  printReport: { ar: "طباعة التقرير", en: "Print Report" },
+  techPerformanceReport: { ar: "تقرير أداء الفنيين", en: "Technician Performance" },
+  masterReport: { ar: "التقرير الشامل", en: "Master Report" },
+  analyticsReport: { ar: "تقرير تحليلي", en: "Analytics Report" },
+  all: { ar: "الكل", en: "All" },
+
+  // Smart Alerts
+  waitPeriodExpired: { ar: "تم انتهاء مهلة الانتظار", en: "Wait Period Expired" },
+  daysInService: { ar: "يوم في الخدمة", en: "days in service" },
+
   // Login
   username: { ar: "اسم المستخدم", en: "Username" },
   password: { ar: "كلمة المرور", en: "Password" },

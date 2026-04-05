@@ -19,6 +19,7 @@ import {
   FileBarChart,
 } from "lucide-react";
 import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
+import PrintFooter from "@/components/PrintFooter";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
@@ -445,17 +446,15 @@ const MaintenanceDetail = () => {
         </section>
       )}
 
-      {/* Print Footer: Technician name + Policy */}
+      {/* Print Footer: Technician name + Address + QR */}
       <div className="hidden print:block mt-4 pt-3 border-t border-foreground/30">
         {technicianName && (
           <div className="flex justify-between items-center mb-2 text-[9pt]">
             <span className="font-bold text-foreground">{t("technicianName")}: {technicianName}</span>
           </div>
         )}
-        <p className="text-center text-[8pt] text-muted-foreground font-semibold">
-          {lang === "ar" ? "حد أقصى 30 يوم للاستلام" : "Maximum 30 days for collection"}
-        </p>
       </div>
+      <PrintFooter />
     </div>
   );
 };

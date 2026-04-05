@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Printer, Plus, Trash2 } from "lucide-react";
 import PrintHeader from "@/components/PrintHeader";
+import PrintFooter from "@/components/PrintFooter";
 
 interface RevenueRow {
   id: string;
@@ -237,6 +238,7 @@ const DailyLedger = () => {
           </div>
         </div>
       </div>
+      <PrintFooter />
     </div>
   );
 };

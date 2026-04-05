@@ -5,13 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { Wrench, AlertCircle, CheckCircle, BanknoteIcon, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const getAlertStatus = (record: { isCompleted: boolean; deliveryDate?: string }) => {
-  if (!record.isCompleted || !record.deliveryDate) return null;
-  const delivery = new Date(record.deliveryDate);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays >= 30) return "blue";
-  if (diffDays >= 7) return "yellow";
+const getAlertStatus = (record: { isCompleted: boolean; deliveryDate?: string; receivedDate: string }) => {
+  // Blue alert: uncompleted task in system for 30+ days
+  if (!record.isCompleted) {
+    const received = new Date(record.receivedDate);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - received.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 30) return "blue";
+  }
+  // Yellow alert: completed but not collected for 7+ days
+  if (record.isCompleted && record.deliveryDate) {
+    const delivery = new Date(record.deliveryDate);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 30) return "blue";
+    if (diffDays >= 7) return "yellow";
+  }
   return null;
 };
 
@@ -57,8 +66,9 @@ const Dashboard = () => {
           <div className="divide-y divide-border">
             {alertRecords.map((r) => {
               const customer = getCustomerById(r.customerId);
-              const delivery = new Date(r.deliveryDate!);
-              const diffDays = Math.floor((new Date().getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
+              const isUncompleted30 = !r.isCompleted;
+              const refDate = isUncompleted30 ? new Date(r.receivedDate) : new Date(r.deliveryDate!);
+              const diffDays = Math.floor((new Date().getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
               return (
                 <div
                   key={r.id}
@@ -68,14 +78,14 @@ const Dashboard = () => {
                   <div>
                     <p className="font-medium">{r.itemName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {customer?.name} • {r.maintenanceId} • {t("delivery")}: {r.deliveryDate}
+                      {customer?.name} • {r.maintenanceId} • {isUncompleted30 ? t("receivedDate") : t("delivery")}: {isUncompleted30 ? r.receivedDate : r.deliveryDate}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{diffDays} {t("daysSinceDelivery")}</span>
+                    <span className="text-xs text-muted-foreground">{diffDays} {isUncompleted30 ? t("daysInService") : t("daysSinceDelivery")}</span>
                     {r.alert === "blue" && (
                       <Badge className="bg-blue-500/15 text-blue-600 border-blue-500/30 text-xs">
-                        {t("waitingExpired")}
+                        {t("waitPeriodExpired")}
                       </Badge>
                     )}
                     {r.alert === "yellow" && (
