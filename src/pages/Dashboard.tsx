@@ -5,13 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { Wrench, AlertCircle, CheckCircle, BanknoteIcon, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const getAlertStatus = (record: { isCompleted: boolean; deliveryDate?: string }) => {
-  if (!record.isCompleted || !record.deliveryDate) return null;
-  const delivery = new Date(record.deliveryDate);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays >= 30) return "blue";
-  if (diffDays >= 7) return "yellow";
+const getAlertStatus = (record: { isCompleted: boolean; deliveryDate?: string; receivedDate: string }) => {
+  // Blue alert: uncompleted task in system for 30+ days
+  if (!record.isCompleted) {
+    const received = new Date(record.receivedDate);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - received.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 30) return "blue";
+  }
+  // Yellow alert: completed but not collected for 7+ days
+  if (record.isCompleted && record.deliveryDate) {
+    const delivery = new Date(record.deliveryDate);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - delivery.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 30) return "blue";
+    if (diffDays >= 7) return "yellow";
+  }
   return null;
 };
 
