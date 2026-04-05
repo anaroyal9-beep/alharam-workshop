@@ -19,6 +19,7 @@ import {
   FileBarChart,
 } from "lucide-react";
 import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
+import PrintFooter from "@/components/PrintFooter";
 
 /* ── Clickable status circle ─────────────────────────────── */
 const StatusCircle = ({
