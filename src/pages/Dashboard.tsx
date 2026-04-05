@@ -82,7 +82,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{diffDays} {t("daysSinceDelivery")}</span>
+                    <span className="text-xs text-muted-foreground">{diffDays} {isUncompleted30 ? t("daysInService") : t("daysSinceDelivery")}</span>
                     {r.alert === "blue" && (
                       <Badge className="bg-blue-500/15 text-blue-600 border-blue-500/30 text-xs">
                         {t("waitingExpired")}
