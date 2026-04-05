@@ -238,6 +238,7 @@ const DailyLedger = () => {
           </div>
         </div>
       </div>
+      <PrintFooter />
     </div>
   );
 };
