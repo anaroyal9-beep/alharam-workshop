@@ -212,7 +212,7 @@ const Reports = () => {
               { label: t("totalOrders"), val: masterSummary.total },
               { label: t("completedOrders"), val: masterSummary.totalCompleted },
               { label: t("pendingTasks"), val: masterSummary.totalPending },
-              { label: t("totalRevenue"), val: `${masterSummary.totalRevenue} ${currency}` },
+              { label: t("totalRevenue"), val: `${masterSummary.totalRevenue} ${currency} ${t("excludingVat")}` },
               { label: t("totalPaid"), val: `${masterSummary.totalPaid} ${currency}` },
               { label: t("remainingBalances"), val: `${masterSummary.unpaid} ${currency}` },
             ].map((s) => (
