@@ -249,11 +249,11 @@ const Reports = () => {
                       <td className="p-2 print:p-1">{r.technicianName || "—"}</td>
                       <td className="p-2 print:p-1">{r.receivedDate}</td>
                       <td className="p-2 print:p-1 font-mono">{total} {currency}</td>
-                      <td className="p-2 print:p-1">
-                        <Badge className={r.isCompleted ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
-                          {r.isCompleted ? t("completed") : t("pending")}
+                       <td className="p-2 print:p-1">
+                        <Badge className={r.isUnderWarranty ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-muted text-muted-foreground"}>
+                          {r.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
                         </Badge>
-                      </td>
+                       </td>
                       <td className="p-2 print:p-1">
                         <Badge className={r.isPaid ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
                           {r.isPaid ? t("paid") : t("unpaid")}
