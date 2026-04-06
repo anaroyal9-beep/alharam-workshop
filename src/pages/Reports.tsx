@@ -189,11 +189,11 @@ const Reports = () => {
                         <td className="p-2 print:p-1">{r.itemName}</td>
                         <td className="p-2 print:p-1">{customer?.name}</td>
                         <td className="p-2 print:p-1">{r.receivedDate}</td>
-                        <td className="p-2 print:p-1">
-                          <Badge className={r.isCompleted ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
-                            {r.isCompleted ? t("completed") : t("pending")}
+                         <td className="p-2 print:p-1">
+                          <Badge className={r.isUnderWarranty ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-muted text-muted-foreground"}>
+                            {r.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
                           </Badge>
-                        </td>
+                         </td>
                       </tr>
                     );
                   })}
