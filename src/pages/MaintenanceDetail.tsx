@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useWorkshop, SparePart } from "@/context/WorkshopContext";
+import { useWorkshop, SparePart, TechnicianAssignment } from "@/context/WorkshopContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
   DollarSign,
   FileText,
   FileBarChart,
+  Plus,
 } from "lucide-react";
 import PrintHeader, { PrintPolicyFooter } from "@/components/PrintHeader";
 import PrintFooter from "@/components/PrintFooter";
@@ -66,8 +67,11 @@ const MaintenanceDetail = () => {
   const [editMaintenanceId, setEditMaintenanceId] = useState(record?.maintenanceId || "");
   const [editReceivedDate, setEditReceivedDate] = useState(record?.receivedDate || "");
   const [failureAnalysis, setFailureAnalysis] = useState(record?.failureAnalysis || "");
-  const [technicianName, setTechnicianName] = useState(record?.technicianName || "");
   const [printMode, setPrintMode] = useState<PrintMode>("none");
+
+  // Multi-technician state
+  const [newTechName, setNewTechName] = useState("");
+  const [newTechPercent, setNewTechPercent] = useState("100");
 
   const additionalPhotoRef = useRef<HTMLInputElement>(null);
 
@@ -81,6 +85,7 @@ const MaintenanceDetail = () => {
   const partsTotal = record.spareParts.reduce((s, p) => s + p.price, 0);
   const total = partsTotal + record.laborFee;
   const currency = t("sar");
+  const assignedTechs = record.assignedTechnicians || [];
 
   const hasPhotos = !!(record.beforePhoto || record.afterPhoto || (record.additionalPhotos?.length ?? 0) > 0);
 
@@ -145,6 +150,23 @@ const MaintenanceDetail = () => {
   const saveFailureAnalysis = () => {
     updateRecord(record.id, { failureAnalysis });
     toast.success(t("failureSaved"));
+  };
+
+  const addTechAssignment = () => {
+    if (!newTechName) return;
+    const updated: TechnicianAssignment[] = [
+      ...assignedTechs,
+      { technicianName: newTechName, contributionPercent: Number(newTechPercent) || 0 },
+    ];
+    updateRecord(record.id, { assignedTechnicians: updated, technicianName: updated.map(t => t.technicianName).join(", ") });
+    setNewTechName("");
+    setNewTechPercent("100");
+    toast.success(t("technicianUpdated"));
+  };
+
+  const removeTechAssignment = (index: number) => {
+    const updated = assignedTechs.filter((_, i) => i !== index);
+    updateRecord(record.id, { assignedTechnicians: updated, technicianName: updated.map(t => t.technicianName).join(", ") });
   };
 
   const handlePrint = (mode: PrintMode) => {
@@ -232,28 +254,54 @@ const MaintenanceDetail = () => {
         </div>
       </section>
 
-      {/* Technician Field - screen only, moved to footer for print */}
+      {/* Multi-Technician Assignment - screen only */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-3 print:hidden">
-        <h3 className="font-bold text-foreground">{t("technicianName")}</h3>
-        <select
-          value={technicianName}
-          onChange={(e) => {
-            setTechnicianName(e.target.value);
-            updateRecord(record.id, { technicianName: e.target.value });
-            toast.success(t("technicianUpdated"));
-          }}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-        >
-          <option value="">{t("selectTechnician")}</option>
-          {technicians.map((tech) => (
-            <option key={tech.id} value={tech.name}>{tech.name}</option>
-          ))}
-        </select>
+        <h3 className="font-bold text-foreground">{t("assignedTechnicians")}</h3>
+        {assignedTechs.length > 0 && (
+          <div className="space-y-2">
+            {assignedTechs.map((at, idx) => (
+              <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-lg p-2">
+                <span className="flex-1 text-sm font-semibold">{at.technicianName}</span>
+                <span className="text-xs text-muted-foreground font-mono">{at.contributionPercent}%</span>
+                <Button variant="ghost" size="sm" className="h-7 text-destructive" onClick={() => removeTechAssignment(idx)}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <select
+              value={newTechName}
+              onChange={(e) => setNewTechName(e.target.value)}
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">{t("selectTechnician")}</option>
+              {technicians.map((tech) => (
+                <option key={tech.id} value={tech.name}>{tech.name}</option>
+              ))}
+            </select>
+          </div>
+          <Input
+            type="number"
+            placeholder={t("contributionPercent")}
+            value={newTechPercent}
+            onChange={(e) => setNewTechPercent(e.target.value)}
+            className="w-24 rounded-lg"
+            min="0"
+            max="100"
+          />
+          <Button onClick={addTechAssignment} size="sm" className="rounded-lg">
+            <Plus className="w-4 h-4 ml-1" />
+            {t("addTechToTask")}
+          </Button>
+        </div>
       </section>
 
       {/* Status Overview */}
       <section className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-5 print:shadow-none print:border print:rounded-none print:p-3 print:space-y-2">
-        <h3 className="font-bold text-foreground print:text-[10pt]">{t("orderStatus")}</h3>
+        <h3 className="font-bold text-foreground print:text-[10pt] print:hidden">{t("orderStatus")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 print:grid-cols-3 print:gap-2">
           {/* Maintenance - hidden in print */}
           <div className="bg-muted/40 rounded-lg p-4 flex items-center justify-between print:hidden">
@@ -319,7 +367,7 @@ const MaintenanceDetail = () => {
           </div>
         </div>
 
-        {/* Print-only warranty line */}
+        {/* Print-only warranty line (no order status) */}
         <div className="hidden print:block text-center py-1.5 border border-border rounded print:text-[10pt] font-bold">
           {record.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
         </div>
@@ -412,8 +460,12 @@ const MaintenanceDetail = () => {
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-foreground">
-                <td className="py-3 text-base font-extrabold text-foreground print:py-2 print:text-[11pt] print:bg-muted/30 print:pr-2">{t("total")}</td>
-                <td className="py-3 text-base font-extrabold font-mono text-primary print:py-2 print:text-[11pt] print:bg-muted/30">{total} {currency}</td>
+                <td className="py-3 text-base font-extrabold text-foreground print:py-2 print:text-[11pt] print:bg-muted/30 print:pr-2">
+                  {t("total")} <span className="text-xs font-semibold text-muted-foreground">{t("excludingVat")}</span>
+                </td>
+                <td className="py-3 text-base font-extrabold font-mono text-primary print:py-2 print:text-[11pt] print:bg-muted/30">
+                  {total} {currency}
+                </td>
                 <td className="print:hidden"></td>
               </tr>
             </tfoot>
@@ -446,11 +498,13 @@ const MaintenanceDetail = () => {
         </section>
       )}
 
-      {/* Print Footer: Technician name + Address + QR */}
+      {/* Print Footer: Technician names + Address + QR */}
       <div className="hidden print:block mt-4 pt-3 border-t border-foreground/30">
-        {technicianName && (
+        {assignedTechs.length > 0 && (
           <div className="flex justify-between items-center mb-2 text-[9pt]">
-            <span className="font-bold text-foreground">{t("technicianName")}: {technicianName}</span>
+            <span className="font-bold text-foreground">
+              {t("assignedTechnicians")}: {assignedTechs.map(at => `${at.technicianName} (${at.contributionPercent}%)`).join(" — ")}
+            </span>
           </div>
         )}
       </div>
