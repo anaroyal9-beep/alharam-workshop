@@ -177,7 +177,7 @@ const Reports = () => {
                     <th className="text-right p-2 print:p-1">{t("device")}</th>
                     <th className="text-right p-2 print:p-1">{t("customer")}</th>
                     <th className="text-right p-2 print:p-1">{t("receivedDate")}</th>
-                    <th className="text-right p-2 print:p-1">{t("orderStatus")}</th>
+                     <th className="text-right p-2 print:p-1">{t("warrantyStatus")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -189,11 +189,11 @@ const Reports = () => {
                         <td className="p-2 print:p-1">{r.itemName}</td>
                         <td className="p-2 print:p-1">{customer?.name}</td>
                         <td className="p-2 print:p-1">{r.receivedDate}</td>
-                        <td className="p-2 print:p-1">
-                          <Badge className={r.isCompleted ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
-                            {r.isCompleted ? t("completed") : t("pending")}
+                         <td className="p-2 print:p-1">
+                          <Badge className={r.isUnderWarranty ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-muted text-muted-foreground"}>
+                            {r.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
                           </Badge>
-                        </td>
+                         </td>
                       </tr>
                     );
                   })}
@@ -212,7 +212,7 @@ const Reports = () => {
               { label: t("totalOrders"), val: masterSummary.total },
               { label: t("completedOrders"), val: masterSummary.totalCompleted },
               { label: t("pendingTasks"), val: masterSummary.totalPending },
-              { label: t("totalRevenue"), val: `${masterSummary.totalRevenue} ${currency}` },
+              { label: t("totalRevenue"), val: `${masterSummary.totalRevenue} ${currency} ${t("excludingVat")}` },
               { label: t("totalPaid"), val: `${masterSummary.totalPaid} ${currency}` },
               { label: t("remainingBalances"), val: `${masterSummary.unpaid} ${currency}` },
             ].map((s) => (
@@ -233,7 +233,7 @@ const Reports = () => {
                   <th className="text-right p-2 print:p-1">{t("technicianName")}</th>
                   <th className="text-right p-2 print:p-1">{t("receivedDate")}</th>
                   <th className="text-right p-2 print:p-1">{t("total")}</th>
-                  <th className="text-right p-2 print:p-1">{t("orderStatus")}</th>
+                  <th className="text-right p-2 print:p-1">{t("warrantyStatus")}</th>
                   <th className="text-right p-2 print:p-1">{t("payment")}</th>
                 </tr>
               </thead>
@@ -248,12 +248,12 @@ const Reports = () => {
                       <td className="p-2 print:p-1">{customer?.name}</td>
                       <td className="p-2 print:p-1">{r.technicianName || "—"}</td>
                       <td className="p-2 print:p-1">{r.receivedDate}</td>
-                      <td className="p-2 print:p-1 font-mono">{total} {currency}</td>
-                      <td className="p-2 print:p-1">
-                        <Badge className={r.isCompleted ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
-                          {r.isCompleted ? t("completed") : t("pending")}
+                      <td className="p-2 print:p-1 font-mono">{total} {currency} <span className="text-[8pt] text-muted-foreground">{t("excludingVat")}</span></td>
+                       <td className="p-2 print:p-1">
+                        <Badge className={r.isUnderWarranty ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-muted text-muted-foreground"}>
+                          {r.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
                         </Badge>
-                      </td>
+                       </td>
                       <td className="p-2 print:p-1">
                         <Badge className={r.isPaid ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-[hsl(var(--destructive))]/15 text-[hsl(var(--destructive))]"}>
                           {r.isPaid ? t("paid") : t("unpaid")}

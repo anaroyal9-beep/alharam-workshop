@@ -18,6 +18,11 @@ export interface Technician {
   name: string;
 }
 
+export interface TechnicianAssignment {
+  technicianName: string;
+  contributionPercent: number;
+}
+
 export interface MaintenanceRecord {
   id: string;
   maintenanceId: string;
@@ -37,6 +42,7 @@ export interface MaintenanceRecord {
   notes?: string;
   failureAnalysis?: string;
   technicianName?: string;
+  assignedTechnicians?: TechnicianAssignment[];
 }
 
 interface WorkshopContextType {
@@ -77,24 +83,28 @@ export const WorkshopProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       id: "r1", maintenanceId: "MNT-001", customerId: "c1", itemName: "مكيف سبليت", itemId: "ITM-001",
       receivedDate: "2026-03-20", isCompleted: false, isPaid: false, isUnderWarranty: false,
       spareParts: [{ id: "sp1", name: "كمبروسر", price: 450 }, { id: "sp2", name: "فلتر", price: 80 }],
-      laborFee: 200, notes: "يحتاج تنظيف شامل"
+      laborFee: 200, notes: "يحتاج تنظيف شامل",
+      assignedTechnicians: [{ technicianName: "محمد أحمد", contributionPercent: 100 }],
     },
     {
       id: "r2", maintenanceId: "MNT-002", customerId: "c2", itemName: "غسالة أوتوماتيك", itemId: "ITM-002",
       receivedDate: "2026-03-18", deliveryDate: "2026-03-22", isCompleted: true, isPaid: true, isUnderWarranty: true,
       spareParts: [{ id: "sp3", name: "موتور", price: 600 }],
-      laborFee: 150
+      laborFee: 150,
+      assignedTechnicians: [{ technicianName: "سعيد العمري", contributionPercent: 60 }, { technicianName: "محمد أحمد", contributionPercent: 40 }],
     },
     {
       id: "r3", maintenanceId: "MNT-003", customerId: "c1", itemName: "ثلاجة", itemId: "ITM-003",
       receivedDate: "2026-03-22", isCompleted: false, isPaid: false, isUnderWarranty: false,
-      spareParts: [], laborFee: 100
+      spareParts: [], laborFee: 100,
+      assignedTechnicians: [],
     },
     {
       id: "r4", maintenanceId: "MNT-004", customerId: "c3", itemName: "مكنسة كهربائية", itemId: "ITM-004",
       receivedDate: "2026-03-15", deliveryDate: "2026-03-19", isCompleted: true, isPaid: false, isUnderWarranty: true,
       spareParts: [{ id: "sp4", name: "خرطوم", price: 120 }],
-      laborFee: 80
+      laborFee: 80,
+      assignedTechnicians: [{ technicianName: "سعيد العمري", contributionPercent: 100 }],
     },
   ]);
 
