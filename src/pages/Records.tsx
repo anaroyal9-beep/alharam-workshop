@@ -59,7 +59,7 @@ const Records = () => {
                       ? "bg-green-500/15 text-green-600 border-green-500/30"
                       : "bg-red-500/15 text-red-600 border-red-500/30"
                     }>
-                      {r.isPaid ? t("paid") : `${t("unpaid")} - ${total} ${t("sar")}`}
+                      {r.isPaid ? t("paid") : `${t("unpaid")} - ${total} ${t("sar")} ${t("excludingVat")}`}
                     </Badge>
                   </td>
                   <td className="p-3">
