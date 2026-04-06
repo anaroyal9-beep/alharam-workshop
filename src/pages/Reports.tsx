@@ -248,7 +248,7 @@ const Reports = () => {
                       <td className="p-2 print:p-1">{customer?.name}</td>
                       <td className="p-2 print:p-1">{r.technicianName || "—"}</td>
                       <td className="p-2 print:p-1">{r.receivedDate}</td>
-                      <td className="p-2 print:p-1 font-mono">{total} {currency}</td>
+                      <td className="p-2 print:p-1 font-mono">{total} {currency} <span className="text-[8pt] text-muted-foreground">{t("excludingVat")}</span></td>
                        <td className="p-2 print:p-1">
                         <Badge className={r.isUnderWarranty ? "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" : "bg-muted text-muted-foreground"}>
                           {r.isUnderWarranty ? t("withinWarranty") : t("outsideWarranty")}
