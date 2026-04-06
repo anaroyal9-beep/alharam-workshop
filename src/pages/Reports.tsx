@@ -233,7 +233,7 @@ const Reports = () => {
                   <th className="text-right p-2 print:p-1">{t("technicianName")}</th>
                   <th className="text-right p-2 print:p-1">{t("receivedDate")}</th>
                   <th className="text-right p-2 print:p-1">{t("total")}</th>
-                  <th className="text-right p-2 print:p-1">{t("orderStatus")}</th>
+                  <th className="text-right p-2 print:p-1">{t("warrantyStatus")}</th>
                   <th className="text-right p-2 print:p-1">{t("payment")}</th>
                 </tr>
               </thead>
