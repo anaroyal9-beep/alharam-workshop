@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useWorkshop } from "@/context/WorkshopContext";
 import { useLanguage } from "@/context/LanguageContext";
 import StatCard from "@/components/StatCard";
-import { DollarSign, ShieldCheck, ShieldX, Users, TrendingUp, CreditCard, Banknote } from "lucide-react";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { ShieldCheck, ShieldX, Users, TrendingUp, CreditCard, Banknote } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const COLORS = ["hsl(152,56%,40%)", "hsl(0,84%,40%)", "hsl(38,92%,50%)", "hsl(210,18%,55%)"];
 
@@ -58,37 +58,41 @@ const Statistics = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Payment Distribution */}
+        {/* Payment Distribution - Bar Chart */}
         <div className="bg-card rounded-xl shadow-sm border border-border p-5">
           <h3 className="font-bold text-foreground mb-4">{t("paymentDistribution")}</h3>
           <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={paymentData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+            <BarChart data={paymentData}>
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                 {paymentData.map((_, i) => (
                   <Cell key={i} fill={COLORS[i]} />
                 ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Warranty Distribution */}
+        {/* Warranty Distribution - Bar Chart */}
         <div className="bg-card rounded-xl shadow-sm border border-border p-5">
           <h3 className="font-bold text-foreground mb-4">{t("warrantyDistribution")}</h3>
           <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={warrantyData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+            <BarChart data={warrantyData}>
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                 {warrantyData.map((_, i) => (
                   <Cell key={i} fill={COLORS[i]} />
                 ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Customer Growth */}
+        {/* Customer Growth - Bar Chart */}
         <div className="bg-card rounded-xl shadow-sm border border-border p-5">
           <h3 className="font-bold text-foreground mb-4">{t("customerGrowth")}</h3>
           <ResponsiveContainer width="100%" height={220}>

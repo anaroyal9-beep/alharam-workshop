@@ -33,6 +33,9 @@ const DailyLedger = () => {
     return days[new Date(dateStr).getDay()] || "";
   };
 
+  const [openingBalance, setOpeningBalance] = useState("");
+  const [cashSales, setCashSales] = useState("");
+
   const [revenues, setRevenues] = useState<RevenueRow[]>([]);
   const [revDesc, setRevDesc] = useState("");
   const [revCode, setRevCode] = useState("");
@@ -50,8 +53,11 @@ const DailyLedger = () => {
     const totalTransfer = revenues.reduce((s, r) => s + r.transfer, 0);
     const totalRevenue = totalCash + totalPos + totalTransfer;
     const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
-    return { totalCash, totalPos, totalTransfer, totalRevenue, totalExpenses, net: totalRevenue - totalExpenses };
-  }, [revenues, expenses]);
+    const ob = Number(openingBalance) || 0;
+    const cs = Number(cashSales) || 0;
+    const currentTotal = ob + totalRevenue + cs - totalExpenses;
+    return { totalCash, totalPos, totalTransfer, totalRevenue, totalExpenses, net: totalRevenue - totalExpenses, currentTotal, closingBalance: currentTotal };
+  }, [revenues, expenses, openingBalance, cashSales]);
 
   const addRevenue = () => {
     if (!revDesc.trim() && !revCash && !revPos && !revTransfer) return;
@@ -98,6 +104,30 @@ const DailyLedger = () => {
             <Printer className="w-4 h-4" />
             {t("printLedger")}
           </Button>
+        </div>
+      </div>
+
+      {/* Opening Balance & Cash Sales */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
+        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
+          <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("openingBalance")}</label>
+          <Input
+            type="number"
+            value={openingBalance}
+            onChange={(e) => setOpeningBalance(e.target.value)}
+            placeholder="0"
+            className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
+          />
+        </div>
+        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
+          <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("cashSales")}</label>
+          <Input
+            type="number"
+            value={cashSales}
+            onChange={(e) => setCashSales(e.target.value)}
+            placeholder="0"
+            className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
+          />
         </div>
       </div>
 
@@ -222,19 +252,28 @@ const DailyLedger = () => {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border p-4 print:hidden">
-        <div className="grid grid-cols-3 gap-4 text-center">
+      {/* Summary with Opening Balance formula */}
+      <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("totalRevenue")}</p>
-            <p className="text-lg font-extrabold text-[hsl(var(--success))]">{totals.totalRevenue} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("openingBalance")}</p>
+            <p className="text-lg font-extrabold">{Number(openingBalance) || 0} {currency}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-semibold">{t("totalRevenue")} + {t("cashSales")}</p>
+            <p className="text-lg font-extrabold text-[hsl(var(--success))]">{totals.totalRevenue + (Number(cashSales) || 0)} {currency}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-semibold">{t("totalExpenses")}</p>
             <p className="text-lg font-extrabold text-destructive">{totals.totalExpenses} {currency}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("netAmount")}</p>
-            <p className="text-lg font-extrabold">{totals.net} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("currentTotalBalance")}</p>
+            <p className="text-xl font-extrabold text-primary">{totals.currentTotal} {currency}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-semibold">{t("closingBalance")}</p>
+            <p className="text-xl font-extrabold">{totals.closingBalance} {currency}</p>
           </div>
         </div>
       </div>

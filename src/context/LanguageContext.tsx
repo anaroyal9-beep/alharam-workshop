@@ -174,6 +174,12 @@ const translations: Translations = {
   totalExpenses: { ar: "إجمالي المصروفات", en: "Total Expenses" },
   netAmount: { ar: "الصافي", en: "Net" },
   dayNames: { ar: "الأحد,الإثنين,الثلاثاء,الأربعاء,الخميس,الجمعة,السبت", en: "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday" },
+  openingBalance: { ar: "الرصيد السابق الافتتاحي", en: "Opening Balance" },
+  cashSales: { ar: "المبيعات النقدية", en: "Cash Sales" },
+  currentTotalBalance: { ar: "مجموع الرصيد الحالي", en: "Current Total Balance" },
+  closingBalance: { ar: "رصيد الإقفال", en: "Closing Balance" },
+  saveRecord: { ar: "حفظ", en: "Save" },
+  editRecord: { ar: "تعديل", en: "Edit" },
 
   // Technicians
   tasks: { ar: "مهمة", en: "tasks" },
