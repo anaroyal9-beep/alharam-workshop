@@ -197,6 +197,21 @@ const MaintenanceDetail = () => {
       <div className="flex items-center justify-between print:hidden">
         <h2 className="text-2xl font-bold text-foreground">{t("maintenanceDetails")}</h2>
         <div className="flex gap-2">
+          <Button
+            size="sm"
+            className="rounded-lg shadow-sm bg-[hsl(var(--success))] hover:bg-[hsl(var(--success))]/90 text-white"
+            onClick={() => {
+              updateRecord(record.id, {
+                laborFee: Number(laborFee),
+                maintenanceId: editMaintenanceId,
+                receivedDate: editReceivedDate,
+                failureAnalysis,
+              });
+              toast.success(t("saveRecord"));
+            }}
+          >
+            {t("saveRecord")}
+          </Button>
           <Button variant="outline" size="sm" className="rounded-lg shadow-sm" onClick={() => handlePrint("quotation")}>
             <FileBarChart className="w-4 h-4 ml-2" />
             {t("printQuotation")}
