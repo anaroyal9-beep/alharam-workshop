@@ -26,13 +26,16 @@ const AppSidebar = () => {
           <img
             alt="شعار ورشة الهرم المثالي"
             src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png"
-            className="w-16 h-16 shrink-0 object-contain"
+            className="w-20 h-20 shrink-0 object-contain"
           />
           <div className="min-w-0">
-            <h1 className="text-white leading-snug text-base font-extrabold tracking-wide">
+            <h1 className="text-white leading-snug text-lg font-extrabold tracking-wide">
               AL HARAM PERFECT WORKSHOP
             </h1>
-            <p className="text-white/80 mt-0.5 leading-tight text-sm font-bold">
+            <p className="text-white/70 mt-0.5 leading-tight text-xs italic font-medium tracking-wide">
+              For Machinery & Equipment
+            </p>
+            <p className="text-white/60 mt-0.5 leading-tight text-[11px] font-bold">
               ورشة الهرم المثالي للآلات والمعدات
             </p>
           </div>

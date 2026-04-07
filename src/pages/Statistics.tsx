@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useWorkshop } from "@/context/WorkshopContext";
 import { useLanguage } from "@/context/LanguageContext";
 import StatCard from "@/components/StatCard";
-import { DollarSign, ShieldCheck, ShieldX, Users, TrendingUp, CreditCard, Banknote } from "lucide-react";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { ShieldCheck, ShieldX, Users, TrendingUp, CreditCard, Banknote } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const COLORS = ["hsl(152,56%,40%)", "hsl(0,84%,40%)", "hsl(38,92%,50%)", "hsl(210,18%,55%)"];
 
