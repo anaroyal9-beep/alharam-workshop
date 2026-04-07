@@ -13,6 +13,7 @@ interface RevenueRow {
   cash: number;
   pos: number;
   transfer: number;
+  isAutoEntry?: boolean;
 }
 
 interface ExpenseRow {
@@ -34,7 +35,7 @@ const DailyLedger = () => {
   };
 
   const [openingBalance, setOpeningBalance] = useState("");
-  const [cashSales, setCashSales] = useState("");
+  const [cashSalesAmount, setCashSalesAmount] = useState("");
 
   const [revenues, setRevenues] = useState<RevenueRow[]>([]);
   const [revDesc, setRevDesc] = useState("");
@@ -47,17 +48,26 @@ const DailyLedger = () => {
   const [expDesc, setExpDesc] = useState("");
   const [expAmt, setExpAmt] = useState("");
 
+  const cashSalesValue = Number(cashSalesAmount) || 0;
+
+  const allRevenues = useMemo(() => {
+    const cashSalesRow: RevenueRow | null = cashSalesValue > 0
+      ? { id: "cash-sales-auto", description: t("cashSales"), code: "—", cash: cashSalesValue, pos: 0, transfer: 0, isAutoEntry: true }
+      : null;
+    return cashSalesRow ? [cashSalesRow, ...revenues] : [...revenues];
+  }, [revenues, cashSalesValue, t]);
+
   const totals = useMemo(() => {
-    const totalCash = revenues.reduce((s, r) => s + r.cash, 0);
-    const totalPos = revenues.reduce((s, r) => s + r.pos, 0);
-    const totalTransfer = revenues.reduce((s, r) => s + r.transfer, 0);
+    const totalCash = allRevenues.reduce((s, r) => s + r.cash, 0);
+    const totalPos = allRevenues.reduce((s, r) => s + r.pos, 0);
+    const totalTransfer = allRevenues.reduce((s, r) => s + r.transfer, 0);
     const totalRevenue = totalCash + totalPos + totalTransfer;
     const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
     const ob = Number(openingBalance) || 0;
-    const cs = Number(cashSales) || 0;
-    const currentTotal = ob + totalRevenue + cs - totalExpenses;
-    return { totalCash, totalPos, totalTransfer, totalRevenue, totalExpenses, net: totalRevenue - totalExpenses, currentTotal, closingBalance: currentTotal };
-  }, [revenues, expenses, openingBalance, cashSales]);
+    const currentTotal = ob + totalRevenue - totalExpenses;
+    const remainingCustody = totalRevenue - totalExpenses;
+    return { totalCash, totalPos, totalTransfer, totalRevenue, totalExpenses, remainingCustody, currentTotal, closingBalance: currentTotal };
+  }, [allRevenues, expenses, openingBalance]);
 
   const addRevenue = () => {
     if (!revDesc.trim() && !revCash && !revPos && !revTransfer) return;
@@ -107,7 +117,7 @@ const DailyLedger = () => {
         </div>
       </div>
 
-      {/* Opening Balance & Cash Sales */}
+      {/* Opening Balance & Cash Sales Input */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
         <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
           <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("openingBalance")}</label>
@@ -123,8 +133,8 @@ const DailyLedger = () => {
           <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("cashSales")}</label>
           <Input
             type="number"
-            value={cashSales}
-            onChange={(e) => setCashSales(e.target.value)}
+            value={cashSalesAmount}
+            onChange={(e) => setCashSalesAmount(e.target.value)}
             placeholder="0"
             className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
           />
@@ -149,6 +159,17 @@ const DailyLedger = () => {
               </tr>
             </thead>
             <tbody>
+              {/* Cash Sales auto-row */}
+              {cashSalesValue > 0 && (
+                <tr className="bg-primary/5">
+                  <td className={cellClass}>{""}</td>
+                  <td className={cellClass}>{""}</td>
+                  <td className={`${cellClass} font-extrabold`}>{cashSalesValue}</td>
+                  <td className={`${cellClass} text-right font-extrabold`}>{t("cashSales")}</td>
+                  <td className={cellClass}>{"—"}</td>
+                  <td className="print:hidden w-8" />
+                </tr>
+              )}
               {revenues.map((r) => (
                 <tr key={r.id}>
                   <td className={cellClass}>{r.transfer || ""}</td>
@@ -173,8 +194,8 @@ const DailyLedger = () => {
                   <Button size="icon" className="h-6 w-6" onClick={addRevenue}><Plus className="w-3.5 h-3.5" /></Button>
                 </td>
               </tr>
-              {revenues.length < 12 &&
-                Array.from({ length: 12 - revenues.length }).map((_, i) => (
+              {(revenues.length + (cashSalesValue > 0 ? 1 : 0)) < 12 &&
+                Array.from({ length: 12 - revenues.length - (cashSalesValue > 0 ? 1 : 0) }).map((_, i) => (
                   <tr key={`empty-rev-${i}`} className="hidden print:table-row">
                     <td className={cellClass}>&nbsp;</td>
                     <td className={cellClass}>&nbsp;</td>
@@ -240,19 +261,15 @@ const DailyLedger = () => {
             </tbody>
           </table>
           <div className="border-t border-border print:border-foreground/40 text-xs font-extrabold print:text-[9pt]">
-            <div className="flex justify-between px-3 py-1.5 border-b border-border print:border-foreground/40">
+            <div className="flex justify-between px-3 py-1.5">
               <span>{t("todayExpenses")}</span>
               <span className="text-destructive">{totals.totalExpenses > 0 ? `${totals.totalExpenses} ${currency}` : "—"}</span>
-            </div>
-            <div className="flex justify-between px-3 py-1.5 border-b border-border print:border-foreground/40">
-              <span>{t("remainingCustody")}</span>
-              <span className="font-extrabold">{totals.net} {currency}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Summary with Opening Balance formula */}
+      {/* Final Summary */}
       <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
           <div>
@@ -260,20 +277,20 @@ const DailyLedger = () => {
             <p className="text-lg font-extrabold">{Number(openingBalance) || 0} {currency}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("totalRevenue")} + {t("cashSales")}</p>
-            <p className="text-lg font-extrabold text-[hsl(var(--success))]">{totals.totalRevenue + (Number(cashSales) || 0)} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("totalRevenue")}</p>
+            <p className="text-lg font-extrabold text-[hsl(var(--success))]">{totals.totalRevenue} {currency}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-semibold">{t("totalExpenses")}</p>
             <p className="text-lg font-extrabold text-destructive">{totals.totalExpenses} {currency}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("currentTotalBalance")}</p>
-            <p className="text-xl font-extrabold text-primary">{totals.currentTotal} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("remainingCustody")}</p>
+            <p className="text-lg font-extrabold text-accent-foreground">{totals.remainingCustody} {currency}</p>
           </div>
-          <div>
+          <div className="border-2 border-primary/30 rounded-lg p-2">
             <p className="text-xs text-muted-foreground font-semibold">{t("closingBalance")}</p>
-            <p className="text-xl font-extrabold">{totals.closingBalance} {currency}</p>
+            <p className="text-xl font-extrabold text-primary">{totals.closingBalance} {currency}</p>
           </div>
         </div>
       </div>
