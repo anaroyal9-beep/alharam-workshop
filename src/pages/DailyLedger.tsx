@@ -117,24 +117,14 @@ const DailyLedger = () => {
         </div>
       </div>
 
-      {/* Opening Balance & Cash Sales Input */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
-        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
+      {/* Opening Balance Input */}
+      <div className="grid grid-cols-1 gap-4 print:gap-2">
+        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2 max-w-md">
           <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("openingBalance")}</label>
           <Input
             type="number"
             value={openingBalance}
             onChange={(e) => setOpeningBalance(e.target.value)}
-            placeholder="0"
-            className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
-          />
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
-          <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("cashSales")}</label>
-          <Input
-            type="number"
-            value={cashSalesAmount}
-            onChange={(e) => setCashSalesAmount(e.target.value)}
             placeholder="0"
             className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
           />
