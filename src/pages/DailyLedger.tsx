@@ -35,7 +35,7 @@ const DailyLedger = () => {
   };
 
   const [openingBalance, setOpeningBalance] = useState("");
-  const [cashSalesAmount, setCashSalesAmount] = useState("");
+  const cashSalesAmount = "";
 
   const [revenues, setRevenues] = useState<RevenueRow[]>([]);
   const [revDesc, setRevDesc] = useState("");
