@@ -21,27 +21,26 @@ const AppSidebar = () => {
 
   return (
     <aside className="w-72 min-h-screen bg-sidebar flex flex-col shrink-0">
-      <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-[16px]">
+      <div className="px-6 pt-8 pb-6 flex flex-col items-center text-center">
+        <div className="rounded-2xl bg-white/[0.04] ring-1 ring-white/10 p-4 mb-4 shadow-lg backdrop-blur-sm">
           <img
             alt="شعار ورشة الهرم المثالي"
             src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png"
-            className="w-20 h-20 shrink-0 object-contain"
+            className="w-24 h-24 object-contain"
           />
-          <div className="min-w-0">
-            <h1 className="text-white leading-snug text-lg font-extrabold tracking-wide">
-              AL HARAM PERFECT WORKSHOP
-            </h1>
-            <p className="text-white/70 mt-0.5 leading-tight text-xs italic font-medium tracking-wide">
-              For Machinery & Equipment
-            </p>
-            <p className="text-white/60 mt-0.5 leading-tight text-[11px] font-bold">
-              ورشة الهرم المثالي للآلات والمعدات
-            </p>
-          </div>
         </div>
+        <h1 className="text-white text-[15px] font-extrabold tracking-[0.08em] leading-tight">
+          AL HARAM PERFECT WORKSHOP
+        </h1>
+        <p className="text-white/50 mt-1.5 text-[11px] italic font-medium tracking-wide">
+          For Machinery & Equipment
+        </p>
+        <p className="text-white/40 mt-1 text-[11px] font-bold">
+          ورشة الهرم المثالي للآلات والمعدات
+        </p>
       </div>
-      <nav className="flex-1 p-3 space-y-1">
+      <div className="mx-6 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <nav className="flex-1 p-3 pt-4 space-y-1">
         {links.map((link) => {
           const isActive = location.pathname === link.to;
           return (
