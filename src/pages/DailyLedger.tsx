@@ -284,7 +284,7 @@ const DailyLedger = () => {
           </div>
         </div>
       </div>
-      <PrintFooter />
+      <PrintFooter variant="ledger" />
     </div>
   );
 };
