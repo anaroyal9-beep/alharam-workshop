@@ -11,10 +11,10 @@ const Layout = () => {
       <AppSidebar />
       <div className="flex-1 flex flex-col">
         {/* Top header with language toggle */}
-        <header className="h-12 flex items-center justify-end px-4 border-b border-border bg-card print:hidden">
+        <header className="h-10 flex items-center justify-end px-4 bg-primary shadow-md print:hidden">
           <button
             onClick={toggleLang}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-muted-foreground hover:bg-muted/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-semibold text-white hover:bg-white/10 transition-colors"
           >
             <Globe className="w-4 h-4" />
             {lang === "ar" ? "English" : "العربية"}
