@@ -275,8 +275,8 @@ const DailyLedger = () => {
             <p className="text-lg font-extrabold text-destructive">{totals.totalExpenses} {currency}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("remainingCustody")}</p>
-            <p className="text-lg font-extrabold text-accent-foreground">{totals.remainingCustody} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("currentTotalBalance")}</p>
+            <p className="text-lg font-extrabold text-accent-foreground">{totals.currentTotal} {currency}</p>
           </div>
           <div className="border-2 border-primary/30 rounded-lg p-2">
             <p className="text-xs text-muted-foreground font-semibold">{t("closingBalance")}</p>
