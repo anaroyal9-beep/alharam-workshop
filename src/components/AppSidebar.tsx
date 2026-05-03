@@ -21,21 +21,21 @@ const AppSidebar = () => {
 
   return (
     <aside className="w-72 min-h-screen bg-sidebar flex flex-col shrink-0">
-      <div className="px-6 pt-8 pb-6 flex flex-col items-center text-center">
-        <div className="rounded-2xl bg-white/[0.04] ring-1 ring-white/10 p-4 mb-4 shadow-lg backdrop-blur-sm">
+      <div className="px-4 pt-3 pb-2 flex flex-col items-center text-center">
+        <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/10 p-2 mb-1.5 shadow-lg backdrop-blur-sm">
           <img
             alt="شعار ورشة الهرم المثالي"
             src="/lovable-uploads/f431f402-2a1d-4b58-8f0e-258c4285db2d.png"
-            className="w-24 h-24 object-contain"
+            className="w-[76px] h-[76px] object-contain"
           />
         </div>
-        <h1 className="text-white text-[15px] font-extrabold tracking-[0.08em] leading-tight">
+        <h1 className="text-white text-[13px] font-extrabold tracking-[0.07em] leading-tight">
           AL HARAM PERFECT WORKSHOP
         </h1>
-        <p className="text-white/50 mt-1.5 text-[11px] italic font-medium tracking-wide">
+        <p className="text-white/50 mt-0.5 text-[9px] italic font-light tracking-wide">
           For Machinery & Equipment
         </p>
-        <p className="text-white/40 mt-1 text-[11px] font-bold">
+        <p className="text-white/40 mt-0.5 text-[10px] font-bold">
           ورشة الهرم المثالي للآلات والمعدات
         </p>
       </div>
