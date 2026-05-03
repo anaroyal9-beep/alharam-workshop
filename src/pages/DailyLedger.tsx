@@ -95,7 +95,7 @@ const DailyLedger = () => {
   const currency = t("sar");
 
   return (
-    <div className="space-y-4 print:space-y-2" dir="rtl">
+    <div className="space-y-4 print:space-y-2 print-ledger" dir="rtl">
       <PrintHeader />
       <div className="hidden print:block text-center pb-2 mb-2">
         <h1 className="text-lg font-extrabold">{t("dailyLedgerPrintTitle")}</h1>
