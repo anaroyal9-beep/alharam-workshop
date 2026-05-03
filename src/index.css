@@ -75,15 +75,15 @@
 @media print {
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 8mm;
   }
 
   body {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 9pt;
-    line-height: 1.5;
+    font-size: 8.5pt;
+    line-height: 1.35;
     font-family: 'Tajawal', 'Inter', sans-serif;
   }
 
@@ -134,7 +134,18 @@
   }
 
   table th, table td {
-    padding: 4px 6px;
+    padding: 2px 4px;
+  }
+
+  /* Single-page A4 fit for ledger and reports */
+  .print-quotation, .print-technical, .print-ledger {
+    page-break-after: avoid;
+  }
+  .print-ledger table th, .print-ledger table td,
+  .print-quotation table th, .print-quotation table td,
+  .print-technical table th, .print-technical table td {
+    padding: 1.5px 4px;
+    font-size: 8pt;
   }
 
   /* ── Quotation mode: hide photos & failure analysis, single page ── */

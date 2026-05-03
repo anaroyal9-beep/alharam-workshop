@@ -35,7 +35,7 @@ const DailyLedger = () => {
   };
 
   const [openingBalance, setOpeningBalance] = useState("");
-  const [cashSalesAmount, setCashSalesAmount] = useState("");
+  const cashSalesAmount = "";
 
   const [revenues, setRevenues] = useState<RevenueRow[]>([]);
   const [revDesc, setRevDesc] = useState("");
@@ -95,7 +95,7 @@ const DailyLedger = () => {
   const currency = t("sar");
 
   return (
-    <div className="space-y-4 print:space-y-2" dir="rtl">
+    <div className="space-y-4 print:space-y-2 print-ledger" dir="rtl">
       <PrintHeader />
       <div className="hidden print:block text-center pb-2 mb-2">
         <h1 className="text-lg font-extrabold">{t("dailyLedgerPrintTitle")}</h1>
@@ -117,24 +117,14 @@ const DailyLedger = () => {
         </div>
       </div>
 
-      {/* Opening Balance & Cash Sales Input */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
-        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
+      {/* Opening Balance Input */}
+      <div className="grid grid-cols-1 gap-4 print:gap-2">
+        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2 max-w-md">
           <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("openingBalance")}</label>
           <Input
             type="number"
             value={openingBalance}
             onChange={(e) => setOpeningBalance(e.target.value)}
-            placeholder="0"
-            className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
-          />
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4 print:rounded-none print:border-foreground/40 print:p-2">
-          <label className="text-xs font-extrabold text-foreground block mb-1 print:text-[9pt]">{t("cashSales")}</label>
-          <Input
-            type="number"
-            value={cashSalesAmount}
-            onChange={(e) => setCashSalesAmount(e.target.value)}
             placeholder="0"
             className="text-lg font-bold text-center print:border-0 print:bg-transparent print:text-[10pt]"
           />
@@ -285,8 +275,8 @@ const DailyLedger = () => {
             <p className="text-lg font-extrabold text-destructive">{totals.totalExpenses} {currency}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-semibold">{t("remainingCustody")}</p>
-            <p className="text-lg font-extrabold text-accent-foreground">{totals.remainingCustody} {currency}</p>
+            <p className="text-xs text-muted-foreground font-semibold">{t("currentTotalBalance")}</p>
+            <p className="text-lg font-extrabold text-accent-foreground">{totals.currentTotal} {currency}</p>
           </div>
           <div className="border-2 border-primary/30 rounded-lg p-2">
             <p className="text-xs text-muted-foreground font-semibold">{t("closingBalance")}</p>
@@ -294,7 +284,7 @@ const DailyLedger = () => {
           </div>
         </div>
       </div>
-      <PrintFooter />
+      <PrintFooter variant="ledger" />
     </div>
   );
 };
