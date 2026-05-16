@@ -331,7 +331,7 @@ const Reports = () => {
         </div>
       )}
 
-      <PrintFooter />
+      <PrintFooter variant="ledger" />
     </div>
   );
 };
