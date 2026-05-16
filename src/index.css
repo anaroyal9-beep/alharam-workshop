@@ -122,6 +122,13 @@
     object-fit: cover;
   }
 
+  .aspect-square img {
+    max-height: none !important;
+    object-fit: contain !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
   input, textarea {
     border: none !important;
     box-shadow: none !important;

@@ -407,24 +407,24 @@ const MaintenanceDetail = () => {
         {hasPhotos && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
             {record.beforePhoto && (
-              <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.beforePhoto} alt="photo" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+              <div className="relative group rounded-lg border border-border overflow-hidden bg-white aspect-square">
+                <img src={record.beforePhoto} alt="photo" className="w-full h-full object-contain p-1" />
                 <button onClick={() => updateRecord(record.id, { beforePhoto: undefined })} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
               </div>
             )}
             {record.afterPhoto && (
-              <div className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={record.afterPhoto} alt="photo" className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+              <div className="relative group rounded-lg border border-border overflow-hidden bg-white aspect-square">
+                <img src={record.afterPhoto} alt="photo" className="w-full h-full object-contain p-1" />
                 <button onClick={() => updateRecord(record.id, { afterPhoto: undefined })} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
               </div>
             )}
             {record.additionalPhotos?.map((photo, i) => (
-              <div key={i} className="relative group rounded-lg border border-border overflow-hidden">
-                <img src={photo} alt={`photo ${i + 1}`} className="w-full h-32 object-cover print:h-auto print:max-h-28" />
+              <div key={i} className="relative group rounded-lg border border-border overflow-hidden bg-white aspect-square">
+                <img src={photo} alt={`photo ${i + 1}`} className="w-full h-full object-contain p-1" />
                 <button onClick={() => removeAdditionalPhoto(i)} className="print:hidden absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
                 </button>
