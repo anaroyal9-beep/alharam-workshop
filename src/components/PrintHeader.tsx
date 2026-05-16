@@ -15,7 +15,7 @@ const PrintHeader = () => {
 
 export const PrintPolicyFooter = () => {
   return (
-    <div className="hidden print:block mt-4 pt-3 border-t border-foreground/30 text-center text-[8pt] text-muted-foreground font-semibold">
+    <div className="hidden print:block mt-1 pt-1 border-t border-foreground/30 text-center text-[7pt] text-muted-foreground font-bold leading-tight m-0">
       حد أقصى 30 يوم للاستلام — Maximum 30 days for collection
     </div>
   );
